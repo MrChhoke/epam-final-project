@@ -1,5 +1,6 @@
 package com.epam.cash.register.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -97,6 +98,12 @@ public class Receipt {
     }
 
     public void addItemReceipt(ItemReceipt itemReceipt){
+        if(items == null){
+            items = new ArrayList<>(20);
+        }
+        if(itemReceipt == null){
+            return;
+        }
         items.add(itemReceipt);
     }
 
