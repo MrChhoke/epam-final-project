@@ -19,4 +19,13 @@
         <servlet-name>WelcomePage</servlet-name>
         <url-pattern>/index.jsp</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Registration</servlet-name>
+        <jsp-file>/jsp-pages/registration.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Registration</servlet-name>
+        <url-pattern>/registration.jsp</url-pattern>
+    </servlet-mapping>
 </web-app>
