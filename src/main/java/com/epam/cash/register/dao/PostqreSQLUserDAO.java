@@ -6,6 +6,7 @@ import com.epam.cash.register.exception.UserNotFoundException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class PostqreSQLUserDAO implements UserDAO {
 
@@ -71,10 +72,10 @@ public class PostqreSQLUserDAO implements UserDAO {
 
     @Override
     public void insert(Connection connection, User user) throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users(login, password, role) VALUES (?,?,?)")) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users(login, password, role) VALUES (?,?,cast(? AS USER_ROLES))")) {
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getPassword());
-            preparedStatement.setString(3, user.getRole().toString());
+            preparedStatement.setString(3, user.getRole().toString().toLowerCase(Locale.ROOT));
             preparedStatement.execute();
         }
     }
