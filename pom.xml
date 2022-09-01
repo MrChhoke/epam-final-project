@@ -15,6 +15,7 @@
         <javax.servlet.version>4.0.1</javax.servlet.version>
         <tomcat.version>8.5.82</tomcat.version>
         <postgresql.version>42.5.0</postgresql.version>
+        <log4j2.version>2.18.0</log4j2.version>
     </properties>
 
     <dependencies>
@@ -40,6 +41,12 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j2.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
