@@ -26,11 +26,18 @@ public class LoginController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, String[]> map = req.getParameterMap();
 
-        if (userService.isUserExists(map.get("username")[0])){
+        if (userService.isUserExists(map.get("username")[0])) {
             User user = userService.findUserByName(map.get("username")[0]);
-            if(user.getPassword().equals(map.get("password")[0])){
-                req.getSession().setAttribute("user",user);
+            if (user.getPassword().equals(map.get("password")[0])) {
+                req.getSession().setAttribute("user", user);
+                resp.sendRedirect("/");
+            }else{
+                getServletContext().setAttribute("error","Password is incorrect");
+                req.getRequestDispatcher("/login.jsp").forward(req, resp);
             }
+        }else{
+            getServletContext().setAttribute("error", "No user was found");
+            req.getRequestDispatcher("/login.jsp").forward(req, resp);
         }
     }
 }

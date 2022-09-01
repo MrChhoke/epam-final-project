@@ -4,9 +4,10 @@
     <title>Login</title>
 </head>
 <body>
+    ${error}
     <form method="post" action="/login">
         <label>Login</label>
-        <input type="text" name="login"/>
+        <input type="text" name="username"/>
         <label>Password</label>
         <input type="text" name="password"/>
         <button>Login</button>
