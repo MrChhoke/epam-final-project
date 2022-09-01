@@ -38,6 +38,15 @@
         <url-pattern>/login.jsp</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>Products</servlet-name>
+        <jsp-file>/jsp-pages/products.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Products</servlet-name>
+        <url-pattern>/products.jsp</url-pattern>
+    </servlet-mapping>
+    
     <error-page>
         <exception-type>com.epam.cash.register.exception.ForbiddenException</exception-type>
         <location>/jsp-pages/forbidden.jsp</location>
