@@ -13,6 +13,10 @@
         </File>
     </Appenders>
     <Loggers>
+        <Logger name="com.epam.cash.register.service.UserServiceImpl" level="ERROR" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="MyFile"/>
+        </Logger>
         <Logger name="com.epam.cash.register.util.DBUtil" level="TRACE" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
