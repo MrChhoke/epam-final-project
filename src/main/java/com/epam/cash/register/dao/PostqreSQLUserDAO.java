@@ -40,7 +40,6 @@ public class PostqreSQLUserDAO implements UserDAO {
         try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users WHERE login = ?")) {
             preparedStatement.setString(1, username);
             resultSet = preparedStatement.executeQuery();
-            resultSet.next();
             if (resultSet.next()) {
                 return createUser(resultSet);
             }
@@ -58,7 +57,6 @@ public class PostqreSQLUserDAO implements UserDAO {
         try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM users WHERE user_id = ?")) {
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
-            resultSet.next();
             if (resultSet.next()) {
                 return createUser(resultSet);
             }
@@ -75,7 +73,7 @@ public class PostqreSQLUserDAO implements UserDAO {
         try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users(login, password, role) VALUES (?,?,cast(? AS USER_ROLES))")) {
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getPassword());
-            preparedStatement.setString(3, user.getRole().toString().toLowerCase(Locale.ROOT));
+            preparedStatement.setString(3, user.getRole().toString());
             preparedStatement.execute();
         }
     }
@@ -115,9 +113,9 @@ public class PostqreSQLUserDAO implements UserDAO {
     }
 
     @Override
-    public void delete(Connection connection, String... usernames) {
+    public void delete(Connection connection, String... usernames) throws SQLException {
         for(String username : usernames){
-            delete(connection, usernames);
+            delete(connection, username);
         }
     }
 
