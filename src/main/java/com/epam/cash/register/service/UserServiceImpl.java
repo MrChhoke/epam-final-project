@@ -6,6 +6,8 @@ import com.epam.cash.register.entity.User;
 import com.epam.cash.register.exception.RegisteredUserException;
 import com.epam.cash.register.exception.UserNotFoundException;
 import com.epam.cash.register.util.DBUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.naming.NamingException;
 import java.io.IOException;
@@ -14,6 +16,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class UserServiceImpl implements UserService {
+
+    private static final Logger log = LogManager.getLogger(UserServiceImpl.class);
 
     private UserDAO userDAO;
 
@@ -36,7 +40,7 @@ public class UserServiceImpl implements UserService {
         try (Connection connection = DBUtil.getConnection()) {
             return userDAO.isUserExists(connection, name);
         } catch (SQLException | NamingException e) {
-            e.printStackTrace();
+            log.error("Something is wrong: ", e);
             return false;
         }
     }
@@ -50,7 +54,7 @@ public class UserServiceImpl implements UserService {
             }
             userDAO.insert(connection, user);
         } catch (SQLException | NamingException e) {
-            e.printStackTrace();
+            log.error("Something is wrong: ", e);
         }
     }
 
@@ -59,7 +63,7 @@ public class UserServiceImpl implements UserService {
         try (Connection connection = DBUtil.getConnection()) {
             return userDAO.findByUsername(connection, name);
         } catch (SQLException | NamingException exp) {
-            exp.printStackTrace();
+            log.error("Something is wrong: ", exp);
             throw new IOException("Smth is wrong", exp);
         }
     }
@@ -69,7 +73,7 @@ public class UserServiceImpl implements UserService {
         try (Connection connection = DBUtil.getConnection()) {
             return userDAO.findAll(connection);
         } catch (SQLException | NamingException exp) {
-            exp.printStackTrace();
+            log.error("Something is wrong: ", exp);
             throw new IOException("Smth is wrong", exp);
         }
     }
@@ -79,7 +83,7 @@ public class UserServiceImpl implements UserService {
         try (Connection connection = DBUtil.getConnection()) {
             userDAO.update(connection, user);
         }catch (SQLException | NamingException exp) {
-            exp.printStackTrace();
+            log.error("Something is wrong: ", exp);
             throw new IOException("Smth is wrong", exp);
         }
     }
@@ -89,7 +93,7 @@ public class UserServiceImpl implements UserService {
         try (Connection connection = DBUtil.getConnection()) {
             userDAO.delete(connection, id);
         }catch (SQLException | NamingException exp) {
-            exp.printStackTrace();
+            log.error("Something is wrong: ", exp);
             throw new IOException("Smth is wrong", exp);
         }
     }
@@ -99,7 +103,7 @@ public class UserServiceImpl implements UserService {
         try (Connection connection = DBUtil.getConnection()) {
             userDAO.delete(connection, username);
         }catch (SQLException | NamingException exp) {
-            exp.printStackTrace();
+            log.error("Something is wrong: ", exp);
             throw new IOException("Smth is wrong", exp);
         }
     }
