@@ -21,7 +21,7 @@ public class PostqreSQLProductDAO implements ProductDAO {
     private static final String COLUMN_CODE_PRODUCT = "code";
     private static final String COLUMN_QUANTITY_PRODUCT = "quantity";
     private static final String COLUMN_DATE_CREATION_PRODUCT = "date_creation";
-    private static final String COLUMN_USER_CREATOR_ID_PRODUCT = "date_creation";
+    private static final String COLUMN_USER_CREATOR_ID_PRODUCT = "user_creator_id";
 
     private static final String GET_ALL_PRODUCT_SQL = "SELECT * FROM products";
     private static final String GET_ALL_STOCK_OF_OUT_PRODUCT_SQL = "SELECT * FROM products WHERE quantity = 0";
