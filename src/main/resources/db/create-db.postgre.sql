@@ -4,10 +4,10 @@ CREATE SEQUENCE IF NOT EXISTS id_items_receipt_sequence START 1 INCREMENT 1;
 CREATE SEQUENCE IF NOT EXISTS id_receipts_sequence START 1 INCREMENT 1;
 
 CREATE TYPE user_roles AS ENUM (
-    'admin',
-    'cashier',
-    'senior_cashier',
-    'commodity expert'
+    'ADMIN',
+    'CASHIER',
+    'SENIOR_CASHIER',
+    'COMMODITY_EXPERT'
 );
 
 CREATE TABLE IF NOT EXISTS users
