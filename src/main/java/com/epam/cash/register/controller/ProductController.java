@@ -1,34 +1,39 @@
 package com.epam.cash.register.controller;
 
-import com.epam.cash.register.dao.PostqreSQLProductDAO;
-import com.epam.cash.register.dao.ProductDAO;
 import com.epam.cash.register.entity.Product;
 import com.epam.cash.register.entity.User;
 import com.epam.cash.register.service.ProductService;
 import com.epam.cash.register.service.ProductServiceImpl;
 import com.epam.cash.register.service.UserService;
 import com.epam.cash.register.service.UserServiceImpl;
-import com.epam.cash.register.util.DBUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 @WebServlet("/products")
 public class ProductController extends HttpServlet {
+
+    private static final Logger log = LogManager.getLogger(ProductController.class);
 
     private ProductService productService = new ProductServiceImpl();
     private UserService userService = new UserServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/products.jsp").forward(req,resp);
+        req.setAttribute("all_products", productService.findAll());
+        req.getRequestDispatcher("/WEB-INF/jsp-pages/products.jsp").forward(req, resp);
     }
 
     @Override
@@ -48,6 +53,53 @@ public class ProductController extends HttpServlet {
                 user
         );
         productService.insert(product);
-        resp.sendRedirect("/products.jsp");
+        resp.sendRedirect("/products");
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        long idDeletedProduct = -1;
+        try {
+            idDeletedProduct = Long.parseLong(req.getParameterMap().get("id")[0]);
+        } catch (Throwable exp) {
+            log.warn("The problem with id was found: ", exp);
+        }
+        if (idDeletedProduct != -1) {
+            productService.delete(idDeletedProduct);
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        InputStreamReader reader = new InputStreamReader(req.getInputStream());
+        BufferedReader bufferedReader = new BufferedReader(reader);
+        Map<String, String> map = new HashMap<>();
+        String lineInfo;
+        String lineKey = null;
+        while ((lineInfo = bufferedReader.readLine()) != null){
+            if (lineInfo.contains("Content-Disposition: form-data;")){
+                lineKey = lineInfo
+                        .replace("Content-Disposition: form-data; name=\"","")
+                        .replace("\"", "");
+                continue;
+            }
+            if(lineInfo.length() == 0 || lineInfo.contains("WebKit")){
+                continue;
+            }
+            map.put(lineKey,lineInfo);
+        }
+
+        User user = (User) req.getSession().getAttribute("user");
+        Product product = new Product(
+                Long.parseLong(map.get("id")),
+                map.get("new_code"),
+                map.get("new_title_ukr"),
+                map.get("new_title_eng"),
+                Long.parseLong(map.get("new_quantity")),
+                Double.parseDouble(map.get("new_price")),
+                new Date(),
+                user
+        );
+        productService.update(product);
     }
 }
