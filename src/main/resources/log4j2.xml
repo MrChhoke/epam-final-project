@@ -20,7 +20,7 @@
         <Logger name="com.epam.cash.register.util.DBUtil" level="TRACE" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
-        <Root level="ERROR">
+        <Root level="TRACE">
             <AppenderRef ref="MyFile"/>
             <AppenderRef ref="Console"/>
         </Root>
