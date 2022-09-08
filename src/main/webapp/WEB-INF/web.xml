@@ -11,6 +11,11 @@
         <res-auth>Container</res-auth>
     </resource-ref>
 
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/node_modules/*</url-pattern>
+    </servlet-mapping>
+
     <servlet>
         <servlet-name>WelcomePage</servlet-name>
         <jsp-file>/WEB-INF/jsp-pages/index.jsp</jsp-file>
