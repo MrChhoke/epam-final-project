@@ -263,15 +263,13 @@ public class PostqreSQLProductDAO implements ProductDAO {
 
     @Override
     public void update(Connection connection, Product product) throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE products SET title_ukr = ?, title_eng = ?, price = ?, code = ?, quantity = ?, date_creation = ?, user_creator_id = ? WHERE product_id ?")) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE products SET title_ukr = ?, title_eng = ?, price = ?, code = ?, quantity = ? WHERE product_id = ?")) {
             int k = 1;
             preparedStatement.setString(k++, product.getTitle_ukr());
             preparedStatement.setString(k++, product.getTitle_eng());
             preparedStatement.setDouble(k++, product.getPrice());
             preparedStatement.setString(k++, product.getCode());
             preparedStatement.setLong(k++, product.getQuantity());
-            preparedStatement.setDate(k++, new java.sql.Date(product.getDateCreation().getTime()));
-            preparedStatement.setLong(k++, product.getUserCreator().getId());
             preparedStatement.setLong(k++, product.getId());
             preparedStatement.executeUpdate();
         }
