@@ -15,7 +15,7 @@ public interface ReceiptDAO {
 
     List<Receipt> findByUsername(Connection connection, String creatorName) throws SQLException, UserNotFoundException;
 
-    Receipt findById(Connection connection, long id) throws SQLException, ReceiptNotFoundException;
+    Receipt findById(Connection connection, long idReceipt) throws SQLException, ReceiptNotFoundException;
 
     List<Receipt> findAllBetweenDate(Connection connection, Date from, Date to) throws SQLException;
 
