@@ -50,19 +50,15 @@ CREATE TABLE IF NOT EXISTS receipts
 
 CREATE TABLE IF NOT EXISTS items_receipt
 (
-    item_receipt_id BIGINT,
+    item_receipt_id BIGINT DEFAULT nextval('id_items_receipt_sequence'),
+    receipt_id      BIGINT NOT NULL,
     product_id      BIGINT NOT NULL,
     isCanceled      BOOLEAN,
     canceler_id     BIGINT,
     PRIMARY KEY (item_receipt_id),
+    FOREIGN KEY (receipt_id) REFERENCES receipts (receipt_id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products (product_id)
 );
 
-CREATE TABLE IF NOT EXISTS receipts_products
-(
-    receipt_id      BIGINT,
-    item_receipt_id BIGINT,
-    PRIMARY KEY (receipt_id, item_receipt_id),
-    FOREIGN KEY (receipt_id) REFERENCES receipts (receipt_id),
-    FOREIGN KEY (item_receipt_id) REFERENCES items_receipt (item_receipt_id)
-);
+
+INSERT INTO users(login, password, role) VALUES ('Vlad','1234', 'ADMIN'::user_roles);

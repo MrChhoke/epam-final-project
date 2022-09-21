@@ -5,6 +5,7 @@ public class ItemReceipt {
     private long id;
     private Product product;
     private boolean isCanceled;
+    private long idReceipt;
     private User userCanceler;
 
     public ItemReceipt(){
@@ -17,10 +18,20 @@ public class ItemReceipt {
     }
 
     public ItemReceipt(long id,
+                       long idReceipt,
+                       Product product) {
+        this.id = id;
+        this.idReceipt = idReceipt;
+        this.product = product;
+    }
+
+    public ItemReceipt(long id,
                        Product product,
+                       long idReceipt,
                        boolean isCanceled,
                        User userCanceler) {
         this.id = id;
+        this.idReceipt = idReceipt;
         this.product = product;
         this.isCanceled = isCanceled;
         this.userCanceler = userCanceler;
@@ -56,5 +67,13 @@ public class ItemReceipt {
 
     public void setUserCanceler(User userCanceler) {
         this.userCanceler = userCanceler;
+    }
+
+    public long getIdReceipt() {
+        return idReceipt;
+    }
+
+    public void setIdReceipt(long idReceipt) {
+        this.idReceipt = idReceipt;
     }
 }
