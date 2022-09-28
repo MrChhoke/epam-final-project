@@ -15,7 +15,7 @@
 <%if(user.getRole() == User.Role.CASHIER
         || user.getRole() == User.Role.SENIOR_CASHIER
         || user.getRole() == User.Role.ADMIN){%>
-    <h3><a href="/receipts">Receipts</a></h3>
+    <h3><a href="/receipt">Receipts</a></h3>
 <%}%>
 <h2><a href="/exit">Exit</a></h2>
 <%}%>

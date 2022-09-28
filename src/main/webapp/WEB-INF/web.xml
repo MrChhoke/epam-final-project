@@ -45,6 +45,6 @@
 
     <error-page>
         <exception-type>com.epam.cash.register.exception.ForbiddenException</exception-type>
-        <location>/jsp-pages/forbidden.jsp</location>
+        <location>/WEB-INF/jsp-pages/forbidden.jsp</location>
     </error-page>
 </web-app>

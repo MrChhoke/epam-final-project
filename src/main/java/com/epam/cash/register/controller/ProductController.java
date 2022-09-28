@@ -6,6 +6,7 @@ import com.epam.cash.register.service.ProductService;
 import com.epam.cash.register.service.ProductServiceImpl;
 import com.epam.cash.register.service.UserService;
 import com.epam.cash.register.service.UserServiceImpl;
+import com.epam.cash.register.util.RequestUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,12 +15,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 @WebServlet("/products")
@@ -71,23 +68,9 @@ public class ProductController extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        InputStreamReader reader = new InputStreamReader(req.getInputStream());
-        BufferedReader bufferedReader = new BufferedReader(reader);
-        Map<String, String> map = new HashMap<>();
-        String lineInfo;
-        String lineKey = null;
-        while ((lineInfo = bufferedReader.readLine()) != null){
-            if (lineInfo.contains("Content-Disposition: form-data;")){
-                lineKey = lineInfo
-                        .replace("Content-Disposition: form-data; name=\"","")
-                        .replace("\"", "");
-                continue;
-            }
-            if(lineInfo.length() == 0 || lineInfo.contains("WebKit")){
-                continue;
-            }
-            map.put(lineKey,lineInfo);
-        }
+
+        Map<String, String> map = RequestUtil.getMapFromBody(req.getInputStream());
+
 
         User user = (User) req.getSession().getAttribute("user");
         Product product = new Product(

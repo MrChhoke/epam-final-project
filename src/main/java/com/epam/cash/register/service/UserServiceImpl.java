@@ -4,7 +4,6 @@ import com.epam.cash.register.dao.PostqreSQLUserDAO;
 import com.epam.cash.register.dao.UserDAO;
 import com.epam.cash.register.entity.User;
 import com.epam.cash.register.exception.RegisteredUserException;
-import com.epam.cash.register.exception.UserNotFoundException;
 import com.epam.cash.register.util.DBUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +22,10 @@ public class UserServiceImpl implements UserService {
 
     public UserServiceImpl() {
         userDAO = new PostqreSQLUserDAO();
+    }
+
+    public UserServiceImpl(UserDAO userDAO){
+        this.userDAO = userDAO;
     }
 
     @Override
@@ -47,13 +50,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void registerUser(User user) throws RegisteredUserException {
-        try (Connection connection = DBUtil.getConnection()) {
+        Connection connection = null;
+        try {
+            connection = DBUtil.getConnection();
             if (userDAO.isUserExists(connection, user.getUsername()) ||
                     userDAO.isUserExists(connection, user.getId())) {
                 throw new RegisteredUserException("The username is already exist");
             }
+            connection.setAutoCommit(false);
             userDAO.insert(connection, user);
+            connection.commit();
         } catch (SQLException | NamingException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
             log.error("Something is wrong: ", e);
         }
     }
@@ -80,9 +99,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(User user) throws IOException {
-        try (Connection connection = DBUtil.getConnection()) {
+        Connection connection = null;
+        try {
+            connection = DBUtil.getConnection();
+            connection.setAutoCommit(false);
             userDAO.update(connection, user);
-        }catch (SQLException | NamingException exp) {
+            connection.commit();
+        } catch (SQLException | NamingException exp) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
             log.error("Something is wrong: ", exp);
             throw new IOException("Smth is wrong", exp);
         }
@@ -90,9 +125,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(long... id) throws IOException {
-        try (Connection connection = DBUtil.getConnection()) {
+        Connection connection = null;
+        try {
+            connection = DBUtil.getConnection();
+            connection.setAutoCommit(false);
             userDAO.delete(connection, id);
-        }catch (SQLException | NamingException exp) {
+            connection.commit();
+        } catch (SQLException | NamingException exp) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
             log.error("Something is wrong: ", exp);
             throw new IOException("Smth is wrong", exp);
         }
@@ -100,9 +151,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(String username) throws IOException {
-        try (Connection connection = DBUtil.getConnection()) {
+        Connection connection = null;
+        try {
+            connection = DBUtil.getConnection();
+            connection.setAutoCommit(false);
             userDAO.delete(connection, username);
-        }catch (SQLException | NamingException exp) {
+            connection.commit();
+        } catch (SQLException | NamingException exp) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
             log.error("Something is wrong: ", exp);
             throw new IOException("Smth is wrong", exp);
         }
