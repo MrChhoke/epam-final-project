@@ -1,7 +1,10 @@
 package com.epam.cash.register.dao;
 
+import com.epam.cash.register.entity.ItemReceipt;
 import com.epam.cash.register.entity.Receipt;
+import com.epam.cash.register.entity.User;
 import com.epam.cash.register.exception.ReceiptNotFoundException;
+import com.epam.cash.register.exception.ReceiptProcessedException;
 import com.epam.cash.register.exception.UserNotFoundException;
 
 import java.sql.Connection;
@@ -12,6 +15,8 @@ import java.util.List;
 public interface ReceiptDAO {
 
     List<Receipt> findAll(Connection connection) throws SQLException;
+
+    Receipt findByCode(Connection connection, String receiptCode) throws SQLException, ReceiptNotFoundException;
 
     List<Receipt> findByUsername(Connection connection, String creatorName) throws SQLException, UserNotFoundException;
 
@@ -25,13 +30,19 @@ public interface ReceiptDAO {
 
     List<Receipt> findAllBetweenPrice(Connection connection, double from, double to) throws SQLException;
 
-    void insert(Connection connection, Receipt receipt) throws SQLException;
+    Receipt findByProcessedUser(Connection connection, User user) throws SQLException, ReceiptNotFoundException;
 
-    void update(Connection connection, Receipt receipt) throws SQLException;
+    void insert(Connection connection, Receipt receipt) throws SQLException, ReceiptProcessedException;
 
-    void insert(Connection connection, Receipt... receipts) throws SQLException;
+    void update(Connection connection, Receipt receipt) throws SQLException, ReceiptProcessedException;
+
+    void insert(Connection connection, Receipt... receipts) throws SQLException, ReceiptProcessedException;
 
     void delete(Connection connection, long id) throws SQLException;
 
     void delete(Connection connection, long... id) throws SQLException;
+
+    void cancelItemReceipt(Connection connection, ItemReceipt itemReceipt);
+
+    void cancelReceipt(Connection connection, Receipt receipt);
 }

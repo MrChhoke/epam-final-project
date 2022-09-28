@@ -23,10 +23,18 @@ public class PostqreSQLProductDAO implements ProductDAO {
     private static final String COLUMN_DATE_CREATION_PRODUCT = "date_creation";
     private static final String COLUMN_USER_CREATOR_ID_PRODUCT = "user_creator_id";
 
-    private static final String GET_ALL_PRODUCT_SQL = "SELECT * FROM products";
-    private static final String GET_ALL_STOCK_OF_OUT_PRODUCT_SQL = "SELECT * FROM products WHERE quantity = 0";
+    private static final String GET_ALL_PRODUCT_SQL = "SELECT * FROM products WHERE is_deleted = false";
+    private static final String GET_ALL_STOCK_OF_OUT_PRODUCT_SQL = "SELECT * FROM products WHERE is_deleted = false AND quantity = 0";
 
-    private final UserDAO userDAO = new PostqreSQLUserDAO();
+    private final UserDAO userDAO;
+
+    public PostqreSQLProductDAO(){
+        userDAO = new PostqreSQLUserDAO();
+    }
+
+    public PostqreSQLProductDAO(UserDAO userDAO){
+        this.userDAO = userDAO;
+    }
 
     @Override
     public List<Product> findAll(Connection connection) throws SQLException {
@@ -49,7 +57,7 @@ public class PostqreSQLProductDAO implements ProductDAO {
     public Product findById(Connection connection, long id) throws SQLException, ProductNotFoundException {
         ResultSet resultSet = null;
         try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE product_id = ?")) {
-            statement.setString(1, String.valueOf(id));
+            statement.setLong(1, id);
             resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return createProduct(resultSet, connection);
@@ -70,7 +78,7 @@ public class PostqreSQLProductDAO implements ProductDAO {
                 .collect(Collectors.joining(","));
         List<Product> products = new ArrayList<>(100);
         ResultSet rs = null;
-        try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM products WHERE product_id IN(?)")) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM products WHERE product_id IN(?) AND is_deleted = false")) {
             preparedStatement.setString(1,values);
             rs = preparedStatement.executeQuery();
             products.add(createProduct(rs,connection));
@@ -87,12 +95,18 @@ public class PostqreSQLProductDAO implements ProductDAO {
         String values = id.stream()
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));
+
+        if(values.isEmpty()){
+            return new ArrayList<>(0);
+        }
+
         List<Product> products = new ArrayList<>(100);
         ResultSet rs = null;
-        try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM products WHERE product_id IN(?)")) {
-            preparedStatement.setString(1,values);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(String.format("SELECT * FROM products WHERE product_id IN(%s)", values))) {
             rs = preparedStatement.executeQuery();
-            products.add(createProduct(rs,connection));
+            while (rs.next()) {
+                products.add(createProduct(rs, connection));
+            }
         }finally {
             if(rs != null) {
                 rs.close();
@@ -104,7 +118,7 @@ public class PostqreSQLProductDAO implements ProductDAO {
     @Override
     public Product findByCode(Connection connection, String code) throws SQLException, ProductNotFoundException {
         ResultSet resultSet = null;
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE code = ?")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE code = ? AND is_deleted = false")) {
             statement.setString(1, code);
             resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -121,7 +135,7 @@ public class PostqreSQLProductDAO implements ProductDAO {
     @Override
     public Product findByUkrainianTitle(Connection connection, String ukrainianTitle) throws SQLException, ProductNotFoundException {
         ResultSet resultSet = null;
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE title_ukr = ?")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE title_ukr = ? AND is_deleted = false")) {
             statement.setString(1, ukrainianTitle);
             resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -138,7 +152,7 @@ public class PostqreSQLProductDAO implements ProductDAO {
     @Override
     public Product findByEnglishTitle(Connection connection, String englishTitle) throws SQLException, ProductNotFoundException {
         ResultSet resultSet = null;
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE title_eng = ?")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE title_eng = ? AND is_deleted = false")) {
             statement.setString(1, englishTitle);
             resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -173,7 +187,7 @@ public class PostqreSQLProductDAO implements ProductDAO {
     public List<Product> findAllBetweenDate(Connection connection, Date from, Date to) throws SQLException {
         List<Product> products = new ArrayList<>(20);
         ResultSet resultSet = null;
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE date_creation >= ? AND date_creation <= ?")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE date_creation >= ? AND date_creation <= ? AND is_deleted = false")) {
             statement.setDate(1, new java.sql.Date(from.getTime()));
             statement.setDate(2, new java.sql.Date(to.getTime()));
             resultSet = statement.executeQuery();
@@ -193,7 +207,7 @@ public class PostqreSQLProductDAO implements ProductDAO {
     public List<Product> findAllBetweenPrice(Connection connection, double from, double to) throws SQLException {
         List<Product> products = new ArrayList<>(20);
         ResultSet resultSet = null;
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE price >= ? AND price <= ?")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE price >= ? AND price <= ? AND is_deleted = false")) {
             statement.setDouble(1, from);
             statement.setDouble(2, to);
             resultSet = statement.executeQuery();
@@ -213,7 +227,7 @@ public class PostqreSQLProductDAO implements ProductDAO {
         List<Product> products = new ArrayList<>(20);
         ResultSet resultSet = null;
         user = userDAO.findByUsername(connection, user.getUsername());
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products JOIN users ON user_id = user_creator_id WHERE user_id = ?")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products JOIN users ON user_id = user_creator_id WHERE user_id = ? AND is_deleted = false")) {
             statement.setLong(1, user.getId());
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -232,7 +246,7 @@ public class PostqreSQLProductDAO implements ProductDAO {
         List<Product> products = new ArrayList<>(20);
         ResultSet resultSet = null;
         userDAO.findByUsername(connection, username);
-        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products JOIN users ON user_id = user_creator_id WHERE login = ?")) {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM products JOIN users ON user_id = user_creator_id WHERE login = ? AND is_deleted = false")) {
             statement.setString(1, username);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -277,7 +291,7 @@ public class PostqreSQLProductDAO implements ProductDAO {
 
     @Override
     public void delete(Connection connection, long product_id) throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM products WHERE product_id = ?")) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE products SET is_deleted = true WHERE product_id = ?")) {
             preparedStatement.setLong(1, product_id);
             preparedStatement.execute();
         }
@@ -285,7 +299,7 @@ public class PostqreSQLProductDAO implements ProductDAO {
 
     @Override
     public void delete(Connection connection, String code) throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM products WHERE code = ?")) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE products SET is_deleted = true WHERE code = ?")) {
             preparedStatement.setString(1, code);
             preparedStatement.execute();
         }

@@ -6,7 +6,6 @@ import com.epam.cash.register.exception.UserNotFoundException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class PostqreSQLUserDAO implements UserDAO {
 
@@ -20,15 +19,10 @@ public class PostqreSQLUserDAO implements UserDAO {
     @Override
     public List<User> findAll(Connection connection) throws SQLException {
         List<User> users = new ArrayList<>();
-        ResultSet resultSet = null;
-        try (Statement statement = connection.createStatement()) {
-            resultSet = statement.executeQuery(GET_ALL_USERS);
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(GET_ALL_USERS)) {
             while (resultSet.next()) {
                 users.add(createUser(resultSet));
-            }
-        } finally {
-            if (resultSet != null) {
-                resultSet.close();
             }
         }
         return users;

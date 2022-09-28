@@ -3,7 +3,9 @@ package com.epam.cash.register.dao;
 import com.epam.cash.register.entity.ItemReceipt;
 import com.epam.cash.register.entity.Product;
 import com.epam.cash.register.entity.Receipt;
+import com.epam.cash.register.entity.User;
 import com.epam.cash.register.exception.ReceiptNotFoundException;
+import com.epam.cash.register.exception.ReceiptProcessedException;
 import com.epam.cash.register.exception.UserNotFoundException;
 
 import java.sql.*;
@@ -19,13 +21,16 @@ public class PostqreSQLReceiptDAO implements ReceiptDAO {
     private static final String RECEIPT_PRICE = "total_price";
     private static final String RECEIPT_USER_CREATOR_ID = "user_creator_id";
     private static final String RECEIPT_DATE_CREATION = "date_creation";
-    private static final String RECEIPT_CANCELED = "isCanceled";
+    private static final String RECEIPT_CANCELED = "is_canceled";
     private static final String RECEIPT_USER_CANCELER_ID = "user_canceler_id";
+    private static final String RECEIPT_CODE = "receipt_code";
+    private static final String RECEIPT_DONE = "is_done";
 
     private static final String ITEM_RECEIPT_ID = "item_receipt_id";
+    private static final String ITEM_RECEIPT_QUANTITY = "quantity";
     private static final String ITEM_RECEIPT_PRODUCT_ID = "product_id";
     private static final String ITEM_RECEIPT_FOREING_KEY_RECEIPT_ID = "receipt_id";
-    private static final String ITEM_RECEIPT_CANCELED = "isCanceled";
+    private static final String ITEM_RECEIPT_CANCELED = "is_canceled";
     private static final String ITEM_RECEIPT_CANCELER_USER_ID = "canceler_id";
 
     private final ProductDAO productDAO;
@@ -58,6 +63,44 @@ public class PostqreSQLReceiptDAO implements ReceiptDAO {
 
             mapItemReceiptToReceipts(itemReceipts, receipts);
             return receipts;
+        } finally {
+            if (rs != null && !rs.isClosed()) {
+                rs.close();
+            }
+        }
+    }
+
+    @Override
+    public Receipt findByCode(Connection connection, String receiptCode) throws SQLException, ReceiptNotFoundException {
+        List<Receipt> receipts;
+        ResultSet rs = null;
+
+        try (PreparedStatement pstmtReceipts = connection.prepareStatement("SELECT * FROM receipts WHERE receipt_code = ?");
+             PreparedStatement pstmtIDProducts = connection.prepareStatement("SELECT product_id FROM products WHERE product_id IN (SELECT ir.product_id FROM items_receipt ir JOIN receipts r on ir.receipt_id = r.receipt_id WHERE receipt_code = ?)");
+             PreparedStatement pstmtItemsReceipt = connection.prepareStatement("SELECT ir.* FROM items_receipt ir JOIN receipts r on ir.receipt_id = r.receipt_id WHERE receipt_code = ?")) {
+
+            pstmtReceipts.setString(1, receiptCode);
+            rs = pstmtReceipts.executeQuery();
+            receipts = getReceiptsWithoutItemsReceipt(rs, connection);
+            rs.close();
+
+            if (receipts.size() == 0) {
+                throw new ReceiptNotFoundException("No one receipt was found");
+            }
+
+            pstmtIDProducts.setString(1, receiptCode);
+
+            rs = pstmtIDProducts.executeQuery();
+            List<Product> products = getAllProductsByIDs(rs, connection);
+            rs.close();
+
+            pstmtItemsReceipt.setString(1, receiptCode);
+            rs = pstmtItemsReceipt.executeQuery();
+            List<ItemReceipt> itemReceipts = getItemsReceipts(rs, connection, products);
+            rs.close();
+
+            mapItemReceiptToReceipts(itemReceipts, receipts);
+            return receipts.get(0);
         } finally {
             if (rs != null && !rs.isClosed()) {
                 rs.close();
@@ -179,9 +222,9 @@ public class PostqreSQLReceiptDAO implements ReceiptDAO {
         List<Receipt> receipts;
         ResultSet rs = null;
 
-        try (PreparedStatement pstmtReceipts = connection.prepareStatement("SELECT * FROM receipts WHERE iscanceled = ?");
-             PreparedStatement pstmtIDProducts = connection.prepareStatement("SELECT product_id FROM products WHERE product_id IN (SELECT ir.product_id FROM items_receipt ir JOIN receipts r on ir.receipt_id = r.receipt_id WHERE r.iscanceled = ?)");
-             PreparedStatement pstmtItemsReceipt = connection.prepareStatement("SELECT ir.* FROM items_receipt ir JOIN receipts r on ir.receipt_id = r.receipt_id WHERE r.iscanceled = ?")) {
+        try (PreparedStatement pstmtReceipts = connection.prepareStatement("SELECT * FROM receipts WHERE is_canceled = ?");
+             PreparedStatement pstmtIDProducts = connection.prepareStatement("SELECT product_id FROM products WHERE product_id IN (SELECT ir.product_id FROM items_receipt ir JOIN receipts r on ir.receipt_id = r.receipt_id WHERE r.is_canceled = ?)");
+             PreparedStatement pstmtItemsReceipt = connection.prepareStatement("SELECT ir.* FROM items_receipt ir JOIN receipts r on ir.receipt_id = r.receipt_id WHERE r.is_canceled = ?")) {
 
             pstmtReceipts.setBoolean(1, true);
             rs = pstmtReceipts.executeQuery();
@@ -249,13 +292,67 @@ public class PostqreSQLReceiptDAO implements ReceiptDAO {
     }
 
     @Override
-    public void insert(Connection connection, Receipt receipt) throws SQLException {
+    public Receipt findByProcessedUser(Connection connection, User user) throws SQLException, ReceiptNotFoundException {
+        List<Receipt> receipts;
         ResultSet rs = null;
-        try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO receipts(total_price, user_creator_id, date_creation, iscanceled) VALUES (?,?,?,?)", Statement.RETURN_GENERATED_KEYS)) {
+
+        try (PreparedStatement pstmtReceipts = connection.prepareStatement("SELECT * FROM receipts WHERE user_creator_id = ? AND is_done = false");
+             PreparedStatement pstmtIDProducts = connection.prepareStatement("SELECT product_id FROM products WHERE product_id IN (SELECT ir.product_id FROM items_receipt ir JOIN receipts r on ir.receipt_id = r.receipt_id WHERE user_creator_id = ? AND is_done = false)");
+             PreparedStatement pstmtItemsReceipt = connection.prepareStatement("SELECT ir.* FROM items_receipt ir JOIN receipts r on ir.receipt_id = r.receipt_id WHERE user_creator_id = ? AND is_done = false")) {
+
+            pstmtReceipts.setLong(1, user.getId());
+            rs = pstmtReceipts.executeQuery();
+            receipts = getReceiptsWithoutItemsReceipt(rs, connection);
+            rs.close();
+
+            pstmtIDProducts.setLong(1, user.getId());
+            rs = pstmtIDProducts.executeQuery();
+            List<Product> products = getAllProductsByIDs(rs, connection);
+            rs.close();
+
+            pstmtItemsReceipt.setLong(1, user.getId());
+            rs = pstmtItemsReceipt.executeQuery();
+            List<ItemReceipt> itemReceipts = getItemsReceipts(rs, connection, products);
+            rs.close();
+
+            mapItemReceiptToReceipts(itemReceipts, receipts);
+            return receipts.get(0);
+        } finally {
+            if (rs != null && !rs.isClosed()) {
+                rs.close();
+            }
+        }
+    }
+
+    @Override
+    public void insert(Connection connection, Receipt receipt) throws SQLException, ReceiptProcessedException {
+        ResultSet rs = null;
+
+        if (receipt.getItems().size() == 0 && !receipt.isDone()) {
+            throw new ReceiptProcessedException("The user cannot have empty list of items receipt");
+        }
+
+        try (PreparedStatement checkConsistanceStatment = connection.prepareStatement("SELECT receipt_id FROM receipts WHERE is_done = false AND user_creator_id = ?");
+             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO receipts(total_price, user_creator_id, date_creation, is_canceled, is_done, receipt_code) VALUES (?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS)) {
+
+            checkConsistanceStatment.setLong(1, receipt.getUserCreator().getId());
+            rs = checkConsistanceStatment.executeQuery();
+
+            if (rs.next() && rs.next()) {
+                PreparedStatement prstm = connection.prepareStatement("DELETE FROM receipts WHERE receipt_code != ? AND user_creator_id = ?");
+                prstm.setString(1, receipt.getReceiptCode());
+                prstm.setLong(2, receipt.getUserCreator().getId());
+                prstm.executeUpdate();
+            }
+
+            rs.close();
+
             preparedStatement.setDouble(1, receipt.getTotalPrice());
             preparedStatement.setLong(2, receipt.getUserCreator().getId());
             preparedStatement.setDate(3, new java.sql.Date(receipt.getDateCreation().getTime()));
             preparedStatement.setBoolean(4, receipt.isCanceled());
+            preparedStatement.setBoolean(5, receipt.isDone());
+            preparedStatement.setString(6, receipt.getReceiptCode());
             preparedStatement.executeUpdate();
             rs = preparedStatement.getGeneratedKeys();
             long idReceipt = 0;
@@ -276,32 +373,42 @@ public class PostqreSQLReceiptDAO implements ReceiptDAO {
     }
 
     @Override
-    public void update(Connection connection, Receipt receipt) throws SQLException {
-        delete(connection,receipt.getId());
+    public void update(Connection connection, Receipt receipt) throws SQLException, ReceiptProcessedException {
+        delete(connection, receipt.getId());
         insert(connection, receipt);
     }
 
     @Override
-    public void insert(Connection connection, Receipt... receipts) throws SQLException {
-        for(Receipt receipt : receipts){
-            insert(connection,receipt);
+    public void insert(Connection connection, Receipt... receipts) throws SQLException, ReceiptProcessedException {
+        for (Receipt receipt : receipts) {
+            insert(connection, receipt);
         }
     }
 
     @Override
     public void delete(Connection connection, long id) throws SQLException {
-        try(PreparedStatement pstmt = connection.prepareStatement("DELETE FROM receipts WHERE receipt_id = ?")){
-            pstmt.setLong(1,id);
+        try (PreparedStatement pstmt = connection.prepareStatement("DELETE FROM receipts WHERE receipt_id = ?")) {
+            pstmt.setLong(1, id);
             pstmt.execute();
         }
     }
 
     @Override
     public void delete(Connection connection, long... id) throws SQLException {
-        try(PreparedStatement pstmt = connection.prepareStatement("DELETE FROM receipts WHERE receipt_id IN (?)")){
+        try (PreparedStatement pstmt = connection.prepareStatement("DELETE FROM receipts WHERE receipt_id IN (?)")) {
             pstmt.setString(1, Arrays.stream(id).mapToObj(Long::toString).collect(Collectors.joining(",")));
             pstmt.execute();
         }
+    }
+
+    @Override
+    public void cancelItemReceipt(Connection connection, ItemReceipt itemReceipt) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void cancelReceipt(Connection connection, Receipt receipt) {
+        throw new UnsupportedOperationException();
     }
 
     private List<Receipt> getReceiptsWithoutItemsReceipt(ResultSet rs, Connection connection) throws SQLException {
@@ -313,11 +420,12 @@ public class PostqreSQLReceiptDAO implements ReceiptDAO {
             receipt.setTotalPrice(rs.getDouble(RECEIPT_PRICE));
             receipt.setDateCreation(rs.getDate(RECEIPT_DATE_CREATION));
             receipt.setCanceled(rs.getBoolean(RECEIPT_CANCELED));
+            receipt.setReceiptCode(rs.getString(RECEIPT_CODE));
+            receipt.setDone(rs.getBoolean(RECEIPT_DONE));
             try {
                 receipt.setUserCreator(userDAO.findById(connection, rs.getLong(RECEIPT_USER_CREATOR_ID)));
                 receipt.setUserCanceler(userDAO.findById(connection, rs.getLong(RECEIPT_USER_CANCELER_ID)));
-            } catch (UserNotFoundException e) {
-                e.printStackTrace();
+            } catch (UserNotFoundException ignored) {
             }
             receipts.add(receipt);
         }
@@ -346,11 +454,10 @@ public class PostqreSQLReceiptDAO implements ReceiptDAO {
             );
             itemReceipt.setIdReceipt(rs.getLong(ITEM_RECEIPT_FOREING_KEY_RECEIPT_ID));
             itemReceipt.setCanceled(rs.getBoolean(ITEM_RECEIPT_CANCELED));
+            itemReceipt.setQuantity(rs.getLong(ITEM_RECEIPT_QUANTITY));
             try {
                 itemReceipt.setUserCanceler(userDAO.findById(connection, rs.getLong(ITEM_RECEIPT_CANCELER_USER_ID)));
-
-            } catch (UserNotFoundException userNotFoundException) {
-                userNotFoundException.printStackTrace();
+            } catch (UserNotFoundException ignored) {
             }
             itemsReceipts.add(itemReceipt);
         }
@@ -370,11 +477,12 @@ public class PostqreSQLReceiptDAO implements ReceiptDAO {
 
     private long insertItemReceipt(Connection con, ItemReceipt itemReceipt, long receiptID) throws SQLException {
         ResultSet rs = null;
-        try (PreparedStatement preparedStatement = con.prepareStatement("INSERT INTO items_receipt(product_id, receipt_id, iscanceled) VALUES (?,?,?)", Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement preparedStatement = con.prepareStatement("INSERT INTO items_receipt(product_id, receipt_id, is_canceled, quantity) VALUES (?,?,?,?)", Statement.RETURN_GENERATED_KEYS)) {
             int k = 1;
             preparedStatement.setLong(k++, itemReceipt.getProduct().getId());
             preparedStatement.setLong(k++, receiptID);
             preparedStatement.setBoolean(k++, itemReceipt.isCanceled());
+            preparedStatement.setLong(k++, itemReceipt.getQuantity());
             preparedStatement.executeUpdate();
             rs = preparedStatement.getGeneratedKeys();
             if (rs.next()) {
