@@ -4,23 +4,28 @@ public class ItemReceipt {
 
     private long id;
     private Product product;
+    private long quantity;
     private boolean isCanceled;
     private long idReceipt;
     private User userCanceler;
 
-    public ItemReceipt(){
+    public ItemReceipt() {
     }
 
     public ItemReceipt(long id,
+                       long quantity,
                        Product product) {
         this.id = id;
+        this.quantity = quantity;
         this.product = product;
     }
 
     public ItemReceipt(long id,
                        long idReceipt,
+                       long quantity,
                        Product product) {
         this.id = id;
+        this.quantity = quantity;
         this.idReceipt = idReceipt;
         this.product = product;
     }
@@ -28,13 +33,23 @@ public class ItemReceipt {
     public ItemReceipt(long id,
                        Product product,
                        long idReceipt,
+                       long quantity,
                        boolean isCanceled,
                        User userCanceler) {
         this.id = id;
+        this.quantity = quantity;
         this.idReceipt = idReceipt;
         this.product = product;
         this.isCanceled = isCanceled;
         this.userCanceler = userCanceler;
+    }
+
+    public long getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(long quantity) {
+        this.quantity = quantity;
     }
 
     public long getId() {

@@ -9,8 +9,10 @@ public class Receipt {
     private long id;
     private double totalPrice;
     private Date dateCreation;
+    private String receiptCode;
     private User userCreator;
     private boolean isCanceled;
+    private boolean isDone;
     private User userCanceler;
     private List<ItemReceipt> items;
 
@@ -18,11 +20,13 @@ public class Receipt {
     }
 
     public Receipt(long id,
+                   String receiptCode,
                    double totalPrice,
                    Date dateCreation,
                    User userCreator,
                    List<ItemReceipt> items) {
         this.id = id;
+        this.receiptCode = receiptCode;
         this.totalPrice = totalPrice;
         this.dateCreation = dateCreation;
         this.userCreator = userCreator;
@@ -30,6 +34,23 @@ public class Receipt {
     }
 
     public Receipt(long id,
+                   String receiptCode,
+                   double totalPrice,
+                   Date dateCreation,
+                   boolean isDone,
+                   User userCreator,
+                   List<ItemReceipt> items) {
+        this.id = id;
+        this.receiptCode = receiptCode;
+        this.totalPrice = totalPrice;
+        this.isDone = isDone;
+        this.dateCreation = dateCreation;
+        this.userCreator = userCreator;
+        this.items = items;
+    }
+
+    public Receipt(long id,
+                   String receiptCode,
                    double totalPrice,
                    Date dateCreation,
                    User userCreator,
@@ -37,12 +58,24 @@ public class Receipt {
                    User userCanceler,
                    List<ItemReceipt> items) {
         this.id = id;
+        this.receiptCode = receiptCode;
         this.totalPrice = totalPrice;
         this.dateCreation = dateCreation;
         this.userCreator = userCreator;
         this.isCanceled = isCanceled;
         this.userCanceler = userCanceler;
         this.items = items;
+    }
+
+    public Receipt(String receiptCode,
+                   User userCreator,
+                   List<ItemReceipt> items) {
+        this.receiptCode = receiptCode;
+        this.userCreator = userCreator;
+        totalPrice = items.stream().
+                mapToDouble(item -> item.getQuantity() * item.getProduct().getPrice())
+                .sum();
+        dateCreation = new Date();
     }
 
     public long getId() {
@@ -97,17 +130,39 @@ public class Receipt {
         return items;
     }
 
-    public void addItemReceipt(ItemReceipt itemReceipt){
-        if(items == null){
+    public void addItemReceipt(ItemReceipt itemReceipt) {
+        if (items == null) {
             items = new ArrayList<>(20);
         }
-        if(itemReceipt == null){
+        if (itemReceipt == null) {
             return;
         }
+        items.removeIf(item -> item.getProduct().getId() == itemReceipt.getProduct().getId());
+
         items.add(itemReceipt);
+
+        totalPrice = items.stream().
+                mapToDouble(item -> item.getQuantity() * item.getProduct().getPrice())
+                .sum();
+    }
+
+    public String getReceiptCode() {
+        return receiptCode;
+    }
+
+    public void setReceiptCode(String receiptCode) {
+        this.receiptCode = receiptCode;
     }
 
     public void setItems(List<ItemReceipt> items) {
         this.items = items;
+    }
+
+    public boolean isDone() {
+        return isDone;
+    }
+
+    public void setDone(boolean done) {
+        isDone = done;
     }
 }
