@@ -3,12 +3,8 @@ package com.epam.cash.register.service;
 import com.epam.cash.register.entity.ItemReceipt;
 import com.epam.cash.register.entity.Receipt;
 import com.epam.cash.register.entity.User;
-import com.epam.cash.register.exception.ReceiptNotFoundException;
-import com.epam.cash.register.exception.ReceiptProcessedException;
-import com.epam.cash.register.exception.UserNotFoundException;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;

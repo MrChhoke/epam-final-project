@@ -1,9 +1,3 @@
-import java.sql.*;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.sql.DataSource;
-
 import com.epam.cash.register.dao.PostqreSQLProductDAO;
 import com.epam.cash.register.dao.ProductDAO;
 import com.epam.cash.register.dao.UserDAO;
@@ -11,16 +5,22 @@ import com.epam.cash.register.entity.Product;
 import com.epam.cash.register.entity.User;
 import com.epam.cash.register.exception.ProductNotFoundException;
 import com.epam.cash.register.exception.UserNotFoundException;
-import org.junit.*;
-
-
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PostqreSQLProductDAOTest {

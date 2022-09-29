@@ -2,12 +2,8 @@ package com.epam.cash.register.service;
 
 import com.epam.cash.register.entity.Product;
 import com.epam.cash.register.entity.User;
-import com.epam.cash.register.exception.ProductNotFoundException;
-import com.epam.cash.register.exception.UserNotFoundException;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 

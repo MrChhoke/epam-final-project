@@ -1,7 +1,5 @@
 package com.epam.cash.register.entity;
 
-import java.io.Serializable;
-
 public class User implements java.io.Serializable {
     public enum Role{
         ADMIN,

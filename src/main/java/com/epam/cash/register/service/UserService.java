@@ -2,11 +2,8 @@ package com.epam.cash.register.service;
 
 import com.epam.cash.register.entity.User;
 import com.epam.cash.register.exception.RegisteredUserException;
-import com.epam.cash.register.exception.UserNotFoundException;
 
-import javax.naming.NamingException;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 public interface UserService {

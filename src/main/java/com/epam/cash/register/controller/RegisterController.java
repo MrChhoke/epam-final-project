@@ -15,7 +15,7 @@ import java.util.Map;
 @WebServlet(urlPatterns = {"/reg", "/registration"})
 public class RegisterController extends HttpServlet {
 
-    UserService userService = new UserServiceImpl();
+    private UserService userService = new UserServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
