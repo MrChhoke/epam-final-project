@@ -160,14 +160,17 @@ public class ProductServiceImpl implements ProductService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+            log.error("Ooops, something is wrong", exp);
+            throw new IOException("Ooops, something is wrong", exp);
+        }finally {
+            if(connection != null){
                 try {
                     connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            log.error("Ooops, something is wrong", exp);
-            throw new IOException("Ooops, something is wrong", exp);
         }
     }
 
@@ -186,14 +189,17 @@ public class ProductServiceImpl implements ProductService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+            log.error("Ooops, something is wrong", exp);
+            throw new IOException("Ooops, something is wrong", exp);
+        }finally {
+            if(connection != null){
                 try {
                     connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            log.error("Ooops, something is wrong", exp);
-            throw new IOException("Ooops, something is wrong", exp);
         }
     }
 
@@ -212,14 +218,17 @@ public class ProductServiceImpl implements ProductService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+            log.error("Ooops, something is wrong", exp);
+            throw new IOException("Ooops, something is wrong", exp);
+        }finally {
+            if(connection != null){
                 try {
                     connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            log.error("Ooops, something is wrong", exp);
-            throw new IOException("Ooops, something is wrong", exp);
         }
     }
 
@@ -238,14 +247,17 @@ public class ProductServiceImpl implements ProductService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+            log.error("Ooops, something is wrong", exp);
+            throw new IOException("Ooops, something is wrong", exp);
+        }finally {
+            if(connection != null){
                 try {
                     connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            log.error("Ooops, something is wrong", exp);
-            throw new IOException("Ooops, something is wrong", exp);
         }
     }
 }

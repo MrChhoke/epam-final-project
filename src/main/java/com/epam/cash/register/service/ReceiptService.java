@@ -45,7 +45,9 @@ public interface ReceiptService {
 
     void cancelItemReceipt(ItemReceipt itemReceipt) throws IOException;
 
-    void cancelReceipt(Receipt receipt) throws IOException;
+    void cancelReceipt(Receipt receipt, User canceler) throws IOException;
 
     void acceptReceipt(Receipt receipt) throws IOException;
+
+    void cancelReceipt(String codeReceitp, User candeler) throws IOException;
 }

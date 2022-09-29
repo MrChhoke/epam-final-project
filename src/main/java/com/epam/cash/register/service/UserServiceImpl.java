@@ -67,13 +67,16 @@ public class UserServiceImpl implements UserService {
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
-                try {
-                    connection.close();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
             }
             log.error("Something is wrong: ", e);
+        }finally {
+            if(connection != null){
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -112,14 +115,17 @@ public class UserServiceImpl implements UserService {
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
-                try {
-                    connection.close();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
             }
             log.error("Something is wrong: ", exp);
             throw new IOException("Smth is wrong", exp);
+        }finally {
+            if(connection != null){
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -138,14 +144,17 @@ public class UserServiceImpl implements UserService {
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
-                try {
-                    connection.close();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
             }
             log.error("Something is wrong: ", exp);
             throw new IOException("Smth is wrong", exp);
+        }finally {
+            if(connection != null){
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -164,14 +173,17 @@ public class UserServiceImpl implements UserService {
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
-                try {
-                    connection.close();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
             }
             log.error("Something is wrong: ", exp);
             throw new IOException("Smth is wrong", exp);
+        }finally {
+            if(connection != null){
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

@@ -135,14 +135,17 @@ public class ReceiptServiceImpl implements ReceiptService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+            log.error("Ooops, something is wrong", exp);
+            throw new IOException("Ooops, something is wrong", exp);
+        } finally {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            log.error("Ooops, something is wrong", exp);
-            throw new IOException("Ooops, something is wrong", exp);
         }
     }
 
@@ -161,14 +164,17 @@ public class ReceiptServiceImpl implements ReceiptService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+            log.error("Ooops, something is wrong", exp);
+            throw new IOException("Ooops, something is wrong", exp);
+        } finally {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            log.error("Ooops, something is wrong", exp);
-            throw new IOException("Ooops, something is wrong", exp);
         }
     }
 
@@ -187,14 +193,17 @@ public class ReceiptServiceImpl implements ReceiptService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+            log.error("Ooops, something is wrong", exp);
+            throw new IOException("Ooops, something is wrong", exp);
+        } finally {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            log.error("Ooops, something is wrong", exp);
-            throw new IOException("Ooops, something is wrong", exp);
         }
     }
 
@@ -213,14 +222,17 @@ public class ReceiptServiceImpl implements ReceiptService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+            log.error("Ooops, something is wrong", exp);
+            throw new IOException("Ooops, something is wrong", exp);
+        } finally {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            log.error("Ooops, something is wrong", exp);
-            throw new IOException("Ooops, something is wrong", exp);
         }
     }
 
@@ -239,14 +251,17 @@ public class ReceiptServiceImpl implements ReceiptService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+            log.error("Ooops, something is wrong", exp);
+            throw new IOException("Ooops, something is wrong", exp);
+        } finally {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            log.error("Ooops, something is wrong", exp);
-            throw new IOException("Ooops, something is wrong", exp);
         }
     }
 
@@ -265,21 +280,26 @@ public class ReceiptServiceImpl implements ReceiptService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+            log.error("Ooops, something is wrong", exp);
+            throw new IOException("Ooops, something is wrong", exp);
+        } finally {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            log.error("Ooops, something is wrong", exp);
-            throw new IOException("Ooops, something is wrong", exp);
         }
     }
 
+
     @Override
-    public void cancelReceipt(Receipt receipt) throws IOException {
+    public void cancelReceipt(Receipt receipt, User canceler) throws IOException {
         Connection connection = null;
         try {
+            receipt.setUserCanceler(canceler);
             connection = DBUtil.getConnection();
             connection.setAutoCommit(false);
             receiptDAO.cancelReceipt(connection, receipt);
@@ -291,14 +311,17 @@ public class ReceiptServiceImpl implements ReceiptService {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+            }
+            log.error("Ooops, something is wrong", exp);
+            throw new IOException("Ooops, something is wrong", exp);
+        } finally {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            log.error("Ooops, something is wrong", exp);
-            throw new IOException("Ooops, something is wrong", exp);
         }
     }
 
@@ -306,5 +329,37 @@ public class ReceiptServiceImpl implements ReceiptService {
     public void acceptReceipt(Receipt receipt) throws IOException {
         receipt.setDone(true);
         update(receipt);
+    }
+
+    @Override
+    public void cancelReceipt(String codeReceitp, User userCanceler) throws IOException {
+        Connection connection = null;
+        try {
+            Receipt canceledReceipt = findByCode(codeReceitp);
+            canceledReceipt.setUserCanceler(userCanceler);
+            canceledReceipt.setCanceled(true);
+            connection = DBUtil.getConnection();
+            connection.setAutoCommit(false);
+            receiptDAO.cancelReceipt(connection, canceledReceipt);
+            connection.commit();
+        } catch (SQLException | NamingException exp) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            log.error("Ooops, something is wrong", exp);
+            throw new IOException("Ooops, something is wrong", exp);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
