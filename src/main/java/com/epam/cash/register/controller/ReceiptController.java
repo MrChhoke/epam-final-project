@@ -88,4 +88,18 @@ public class ReceiptController extends HttpServlet {
         );
         receiptService.update(receipt);
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Map<String, String> map = RequestUtil.getMapFromBody(req.getInputStream());
+
+        String canceledReceiptCode = map.get("canceledReceiptCode");
+
+        User userCanceler = (User) req.getSession().getAttribute("user");
+
+        if (canceledReceiptCode != null) {
+            receiptService.cancelReceipt(canceledReceiptCode, userCanceler);
+        }
+
+    }
 }
