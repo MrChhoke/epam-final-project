@@ -407,8 +407,12 @@ public class PostqreSQLReceiptDAO implements ReceiptDAO {
     }
 
     @Override
-    public void cancelReceipt(Connection connection, Receipt receipt) {
-        throw new UnsupportedOperationException();
+    public void cancelReceipt(Connection connection, Receipt receipt) throws SQLException {
+        try (PreparedStatement prstm = connection.prepareStatement("UPDATE receipts SET is_canceled = true, user_canceler_id = ? WHERE receipt_code = ?")) {
+            prstm.setLong(1, receipt.getUserCanceler().getId());
+            prstm.setString(2, receipt.getReceiptCode());
+            prstm.executeUpdate();
+        }
     }
 
     private List<Receipt> getReceiptsWithoutItemsReceipt(ResultSet rs, Connection connection) throws SQLException {

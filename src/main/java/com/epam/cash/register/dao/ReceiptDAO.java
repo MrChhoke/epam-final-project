@@ -44,5 +44,5 @@ public interface ReceiptDAO {
 
     void cancelItemReceipt(Connection connection, ItemReceipt itemReceipt);
 
-    void cancelReceipt(Connection connection, Receipt receipt);
+    void cancelReceipt(Connection connection, Receipt receipt) throws SQLException;
 }
