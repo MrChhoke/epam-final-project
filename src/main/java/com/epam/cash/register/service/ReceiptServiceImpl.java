@@ -5,11 +5,13 @@ import com.epam.cash.register.dao.ReceiptDAO;
 import com.epam.cash.register.entity.ItemReceipt;
 import com.epam.cash.register.entity.Receipt;
 import com.epam.cash.register.entity.User;
+import com.epam.cash.register.exception.ReceiptProcessedException;
 import com.epam.cash.register.util.DBUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.naming.NamingException;
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -126,6 +128,11 @@ public class ReceiptServiceImpl implements ReceiptService {
         try {
             connection = DBUtil.getConnection();
             connection.setAutoCommit(false);
+
+            receipt.getItems().removeIf(itemReceipt -> itemReceipt.getQuantity() <= 0L);
+
+            log.trace(receipt.getItems().size());
+
             receiptDAO.insert(connection, receipt);
             connection.commit();
         } catch (NamingException | SQLException exp) {
@@ -155,6 +162,9 @@ public class ReceiptServiceImpl implements ReceiptService {
         try {
             connection = DBUtil.getConnection();
             connection.setAutoCommit(false);
+
+            receipt.getItems().removeIf(itemReceipt -> itemReceipt.getQuantity() <= 0L);
+
             receiptDAO.update(connection, receipt);
             connection.commit();
         } catch (NamingException | SQLException exp) {
