@@ -20,6 +20,10 @@
     </servlet-mapping>
 
     <jsp-config>
+        <taglib>
+            <taglib-uri>showingTags</taglib-uri>
+            <taglib-location>/WEB-INF/my-tags.tld</taglib-location>
+        </taglib>
         <jsp-property-group>
             <url-pattern>*.jsp</url-pattern>
         </jsp-property-group>

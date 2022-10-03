@@ -1,8 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="s" uri="http://mytags.com" %>
 <html>
 <head>
     <title>Receipt</title>
-    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <script src="${pageContext.request.contextPath}/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="${pageContext.request.contextPath}/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -27,13 +28,7 @@
         <c:forEach var="receipt" items="${receipts}">
             <tr id="${receipt.receiptCode}"
                 class="${receipt.canceled ? 'table-danger' : receipt.done ? 'table-success' : 'table-primary'}">
-                <td scope="row">${receipt.id}</td>
-                <td>${receipt.receiptCode}</td>
-                <td>${receipt.totalPrice}</td>
-                <td>${receipt.userCreator.username}</td>
-                <td>${receipt.done}</td>
-                <td>${receipt.canceled}</td>
-                <td>${receipt.userCanceler.username}</td>
+                <s:displayReceipt receipt="${receipt}"/>
                 <td>
                     <button class="btn btn-primary" type="button" data-toggle="collapse"
                             onclick="document.getElementById('${receipt.id}').hidden = !document.getElementById('${receipt.id}').hidden"

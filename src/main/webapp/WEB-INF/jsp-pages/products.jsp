@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib tagdir="/WEB-INF/tags" prefix="show"%>
 <html>
 <head>
     <title>Products</title>
@@ -61,12 +62,7 @@
         <jsp:useBean id="all_products" scope="request" type="java.util.List<com.epam.cash.register.entity.Product>"/>
         <c:forEach items="${all_products}" var="product">
             <tr id="${product.id}">
-                <td scope="row">${product.id}</td>
-                <td id="element_ukrTitle_${product.id}">${product.title_ukr}</td>
-                <td id="element_engTitle_${product.id}">${product.title_eng}</td>
-                <td id="element_price_${product.id}">${product.price}</td>
-                <td id="element_quantity_${product.id}">${product.quantity}</td>
-                <td id="element_code_${product.id}">${product.code}</td>
+                <show:dispayProduct product="${product}"/>
                 <c:if test="${user.role == 'ADMIN' || user.role == 'COMMODITY_EXPERT'}">
                     <td>
                         <button type="button" class="btn btn-danger">Delete</button>
