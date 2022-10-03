@@ -19,7 +19,7 @@ public class LoginController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/login.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/jsp-pages/login.jsp").forward(req, resp);
     }
 
     @Override
@@ -32,12 +32,12 @@ public class LoginController extends HttpServlet {
                 req.getSession().setAttribute("user", user);
                 resp.sendRedirect("/");
             }else{
-                getServletContext().setAttribute("error","Password is incorrect");
-                req.getRequestDispatcher("/login.jsp").forward(req, resp);
+                req.setAttribute("error","Password is incorrect");
+                req.getRequestDispatcher("/WEB-INF/jsp-pages/login.jsp").forward(req, resp);
             }
         }else{
-            getServletContext().setAttribute("error", "No user was found");
-            req.getRequestDispatcher("/login.jsp").forward(req, resp);
+            req.setAttribute("error", "No user was found");
+            req.getRequestDispatcher("/WEB-INF/jsp-pages/login.jsp").forward(req, resp);
         }
     }
 }

@@ -4,6 +4,8 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
+    <display-name>Cash register</display-name>
+
     <resource-ref>
         <description>DB Connection</description>
         <res-ref-name>jdbc/CASH_REGISTER</res-ref-name>
@@ -14,37 +16,23 @@
     <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>/node_modules/*</url-pattern>
+        <url-pattern>/static/*</url-pattern>
     </servlet-mapping>
 
-    <servlet>
-        <servlet-name>WelcomePage</servlet-name>
-        <jsp-file>/WEB-INF/jsp-pages/index.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>WelcomePage</servlet-name>
-        <url-pattern>/index.jsp</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>Registration</servlet-name>
-        <jsp-file>/WEB-INF/jsp-pages/registration.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>Registration</servlet-name>
-        <url-pattern>/registration.jsp</url-pattern>
-    </servlet-mapping>
-    
-    <servlet>
-        <servlet-name>Login</servlet-name>
-        <jsp-file>/WEB-INF/jsp-pages/login.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>Login</servlet-name>
-        <url-pattern>/login.jsp</url-pattern>
-    </servlet-mapping>
+    <jsp-config>
+        <jsp-property-group>
+            <url-pattern>*.jsp</url-pattern>
+        </jsp-property-group>
+    </jsp-config>
 
     <error-page>
         <exception-type>com.epam.cash.register.exception.ForbiddenException</exception-type>
         <location>/WEB-INF/jsp-pages/forbidden.jsp</location>
+    </error-page>
+
+    <error-page>
+        <!--        //TODO FIX ERROR PAGE-->
+        <exception-type>com.epam.cash.register.exception.ReceiptProcessedException</exception-type>
+        <location>/WEB-INF/jsp-pages/error.jsp</location>
     </error-page>
 </web-app>

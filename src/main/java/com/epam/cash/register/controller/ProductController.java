@@ -1,11 +1,9 @@
 package com.epam.cash.register.controller;
 
 import com.epam.cash.register.entity.Product;
+import com.epam.cash.register.entity.Receipt;
 import com.epam.cash.register.entity.User;
-import com.epam.cash.register.service.ProductService;
-import com.epam.cash.register.service.ProductServiceImpl;
-import com.epam.cash.register.service.UserService;
-import com.epam.cash.register.service.UserServiceImpl;
+import com.epam.cash.register.service.*;
 import com.epam.cash.register.util.RequestUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 @WebServlet("/products")
@@ -26,10 +25,23 @@ public class ProductController extends HttpServlet {
 
     private ProductService productService = new ProductServiceImpl();
     private UserService userService = new UserServiceImpl();
+    private ReceiptService receiptService = new ReceiptServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setAttribute("all_products", productService.findAll());
+
+        String receiptCode = (String) req.getSession().getAttribute("receiptCode");
+        Map<Long, Long> mapProductAtReceipt = new HashMap<>();
+
+        if (receiptCode != null) {
+            Receipt receipt = receiptService.findByCode(receiptCode);
+            receipt.getItems().forEach(
+                    itemReceipt -> mapProductAtReceipt.put(itemReceipt.getProduct().getId(), itemReceipt.getQuantity())
+            );
+
+        }
+        req.setAttribute("mapProductAtReceipt", mapProductAtReceipt);
         req.getRequestDispatcher("/WEB-INF/jsp-pages/products.jsp").forward(req, resp);
     }
 

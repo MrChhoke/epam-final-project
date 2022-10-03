@@ -19,12 +19,18 @@ public class RegisterController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/registration.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/jsp-pages/registration.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, String[]> map = req.getParameterMap();
+
+        if (userService.isUserExists(map.get("username")[0])) {
+            req.getServletContext().setAttribute("error", "Username is reserved");
+            req.getRequestDispatcher("/WEB-INF/jsp-pages/registration.jsp").forward(req, resp);
+        }
+
         User user = new User(
                 0L,
                 map.get("username")[0],
@@ -32,6 +38,6 @@ public class RegisterController extends HttpServlet {
                 User.Role.CASHIER
         );
         userService.registerUser(user);
-        req.getRequestDispatcher("/registration.jsp").forward(req,resp);
+        req.getRequestDispatcher("/WEB-INF/jsp-pages/registration.jsp").forward(req, resp);
     }
 }

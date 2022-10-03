@@ -1,41 +1,41 @@
-<%@ page import="com.epam.cash.register.entity.User" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
     <title>Products</title>
-    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <script src="${pageContext.request.contextPath}/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="${pageContext.request.contextPath}/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <jsp:useBean id="user" scope="session" type="com.epam.cash.register.entity.User"/>
+    <jsp:useBean id="mapProductAtReceipt" scope="request" type="java.util.Map<java.lang.Long,java.lang.Long>"/>
 </head>
 <body>
 <div class="container">
-    <% User user = (User) session.getAttribute("user");
-        if (user.getRole() == User.Role.ADMIN || user.getRole() == User.Role.CASHIER) {%>
-    <form method="post" action="/products">
-        <div class="form-group">
-            <label class="">Ukrainian Title</label>
-            <input class="form-control" name="title_ukr" type="text"/>
-        </div>
-        <div class="form-group">
-            <label>English Title</label>
-            <input class="form-control" name="title_eng"/>
-        </div>
-        <div class="form-group">
-            <label>Price</label>
-            <input class="form-control" name="price"/>
-        </div>
-        <div class="form-group">
-            <label>Quantity</label>
-            <input class="form-control" name="quantity"/>
-        </div>
-        <div class="form-group">
-            <label>Code</label>
-            <input class="form-control" name="code"/>
-        </div>
-        <button class="btn btn-success">Send Info</button>
-    </form>
-    <%}%>
+    <c:if test="${user.role == 'ADMIN' || user.role == 'COMMODITY_EXPERT'}">
+        <form method="post" action="${pageContext.request.contextPath}/products">
+            <div class="form-group">
+                <label class="">Ukrainian Title</label>
+                <input class="form-control" name="title_ukr" type="text"/>
+            </div>
+            <div class="form-group">
+                <label>English Title</label>
+                <input class="form-control" name="title_eng"/>
+            </div>
+            <div class="form-group">
+                <label>Price</label>
+                <input class="form-control" name="price"/>
+            </div>
+            <div class="form-group">
+                <label>Quantity</label>
+                <input class="form-control" name="quantity"/>
+            </div>
+            <div class="form-group">
+                <label>Code</label>
+                <input class="form-control" name="code"/>
+            </div>
+            <button class="btn btn-success">Send Info</button>
+        </form>
+    </c:if>
     <table id="table" class="table">
         <tr>
             <th scope="col">ID</th>
@@ -44,20 +44,21 @@
             <th scope="col">Price</th>
             <th scope="col">Quantity</th>
             <th scope="col">Code</th>
-            <c:if test="${user.getRole() == 'ADMIN' || user.getRole() == 'CASHIER'}">
+            <c:if test="${user.role == 'ADMIN' || user.role == 'COMMODITY_EXPERT'}">
                 <th scope="col"></th>
             </c:if>
 
-            <c:if test="${user.getRole() == 'ADMIN' || user.getRole() == 'CASHIER'}">
+            <c:if test="${user.role == 'ADMIN' || user.role == 'COMMODITY_EXPERT'}">
                 <th scope="col"></th>
             </c:if>
-            <c:if test="${user.getRole() == 'ADMIN' || user.getRole() == 'COMMODITY_EXPERT'}">
+            <c:if test="${user.role == 'ADMIN' || user.role == 'CASHIER' || user.role == 'SENIOR_CASHIER'}">
                 <th scope="col">Quanitity</th>
             </c:if>
-            <c:if test="${user.getRole() == 'ADMIN' || user.getRole() == 'COMMODITY_EXPERT'}">
+            <c:if test="${user.role == 'ADMIN' || user.role == 'CASHIER' || user.role == 'SENIOR_CASHIER'}">
                 <th scope="col"></th>
             </c:if>
         </tr>
+        <jsp:useBean id="all_products" scope="request" type="java.util.List<com.epam.cash.register.entity.Product>"/>
         <c:forEach items="${all_products}" var="product">
             <tr id="${product.id}">
                 <td scope="row">${product.id}</td>
@@ -66,23 +67,25 @@
                 <td id="element_price_${product.id}">${product.price}</td>
                 <td id="element_quantity_${product.id}">${product.quantity}</td>
                 <td id="element_code_${product.id}">${product.code}</td>
-                <c:if test="${user.getRole() == 'ADMIN' || user.getRole() == 'CASHIER'}">
+                <c:if test="${user.role == 'ADMIN' || user.role == 'COMMODITY_EXPERT'}">
                     <td>
                         <button type="button" class="btn btn-danger">Delete</button>
                     </td>
                 </c:if>
-                <c:if test="${user.getRole() == 'ADMIN' || user.getRole() == 'CASHIER'}">
+                <c:if test="${user.role == 'ADMIN' || user.role == 'COMMODITY_EXPERT'}">
                     <td>
                         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModal">
                             Edit
                         </button>
                     </td>
                 </c:if>
-                <c:if test="${user.getRole() == 'ADMIN' || user.getRole() == 'COMMODITY_EXPERT'}">
-                    <td><input type="number" class="form-control" value="1" id="input_element_quantity_${product.id}">
+                <c:if test="${user.role == 'ADMIN' || user.role == 'CASHIER' || user.role == 'SENIOR_CASHIER'}">
+                    <td><input type="number" class="form-control"
+                               value="${mapProductAtReceipt.get(product.id) != null ? mapProductAtReceipt.get(product.id) : 0}"
+                               id="input_element_quantity_${product.id}">
                     </td>
                 </c:if>
-                <c:if test="${user.getRole() == 'ADMIN' || user.getRole() == 'COMMODITY_EXPERT'}">
+                <c:if test="${user.role == 'ADMIN' || user.role == 'CASHIER' || user.role == 'SENIOR_CASHIER'}">
                     <td>
                         <button type="button" class="btn btn-success">Add to receipt</button>
                     </td>
@@ -207,7 +210,7 @@
                     $('#element_code_' + element_id).text($('#changed_element_code').val());
                 }
             }
-        ).catch(err => console.log(err));
+        );
     });
 </script>
 </html>

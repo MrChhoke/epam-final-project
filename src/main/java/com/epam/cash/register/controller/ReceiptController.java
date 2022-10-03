@@ -39,7 +39,7 @@ public class ReceiptController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<Receipt> receipts = receiptService.findAll();
 
-        req.getServletContext().setAttribute("receipts", receipts);
+        req.setAttribute("receipts", receipts);
 
         req.getRequestDispatcher("WEB-INF/jsp-pages/receipt.jsp").forward(req, resp);
     }
@@ -55,8 +55,14 @@ public class ReceiptController extends HttpServlet {
 
 
         if (map.containsKey("done")) {
-            Receipt receipt = receiptService.findByCode(map.get("receipt_code"));
+            Receipt receipt = receiptService.findByCode(map.get("receiptCode"));
             receiptService.acceptReceipt(receipt);
+
+            String currentReceiptCode = (String) req.getSession().getAttribute("receiptCode");
+            if (currentReceiptCode != null && currentReceiptCode.equals(map.get("receiptCode"))) {
+                req.getSession().setAttribute("receiptCode", null);
+            }
+
             return;
         }
 

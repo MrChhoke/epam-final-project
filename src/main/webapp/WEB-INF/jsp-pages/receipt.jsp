@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <title>Receipt</title>
@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <script src="${pageContext.request.contextPath}/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="${pageContext.request.contextPath}/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <jsp:useBean id="user" scope="session" class="com.epam.cash.register.entity.User"/>
+    <jsp:useBean id="receipts" scope="request" type="java.util.List<com.epam.cash.register.entity.Receipt>"/>
 </head>
 <body>
 
@@ -23,34 +25,35 @@
             <th></th>
         </tr>
         <c:forEach var="receipt" items="${receipts}">
-            <tr id="${receipt.receiptCode}" class="${receipt.isCanceled() ? 'table-danger' : receipt.isDone() ? 'table-success' : 'table-primary'}" >
+            <tr id="${receipt.receiptCode}"
+                class="${receipt.canceled ? 'table-danger' : receipt.done ? 'table-success' : 'table-primary'}">
                 <td scope="row">${receipt.id}</td>
                 <td>${receipt.receiptCode}</td>
                 <td>${receipt.totalPrice}</td>
                 <td>${receipt.userCreator.username}</td>
-                <td>${receipt.isDone()}</td>
-                <td>${receipt.isCanceled()}</td>
+                <td>${receipt.done}</td>
+                <td>${receipt.canceled}</td>
                 <td>${receipt.userCanceler.username}</td>
                 <td>
                     <button class="btn btn-primary" type="button" data-toggle="collapse"
-                            onclick="document.getElementById('${receipt.id}').hidden = !document.getElementById('${receipt.getId()}').hidden"
+                            onclick="document.getElementById('${receipt.id}').hidden = !document.getElementById('${receipt.id}').hidden"
                             data-target="#collapseReceipt${receipt.id}"
                             aria-expanded="false" aria-controls="collapseExample">
                         Show
                     </button>
                 </td>
                 <td>
-                    <c:if test="${!receipt.isDone()}">
+                    <c:if test="${(user.role == 'ADMIN' || user.role == 'CASHIER' || user.role == 'SENIOR_CASHIER') && (!receipt.done)}">
                         <button class="btn btn-success" type="button">Accept</button>
                     </c:if>
-                    <c:if test="${!receipt.isCanceled() && receipt.isDone()}">
+                    <c:if test="${(user.role == 'ADMIN' || user.role == 'SENIOR_CASHIER') && (!receipt.canceled && receipt.done)}">
                         <button class="btn btn-danger" type="button">Cancel</button>
                     </c:if>
                 </td>
             </tr>
             <tr hidden id="${receipt.id}">
                 <th colspan="8">
-                    <div class="collapse" id="collapseReceipt${receipt.getId()}">
+                    <div class="collapse" id="collapseReceipt${receipt.id}">
                         <div class="card card-body">
                             <table class="table">
                                 <tr>
@@ -61,7 +64,7 @@
                                     <th scope="col">Code</th>
                                     <th scope="col"></th>
                                 </tr>
-                                <c:forEach items="${receipt.getItems()}" var="itemReceipt">
+                                <c:forEach items="${receipt.items}" var="itemReceipt">
                                     <tr>
                                         <td>${itemReceipt.product.title_ukr}</td>
                                         <td>${itemReceipt.product.title_eng}</td>
@@ -95,7 +98,7 @@
         if (buttonText === 'Accept') {
             let data = new FormData();
 
-            data.append('receipt_code', code_receipt.trim());
+            data.append('receiptCode', code_receipt.trim());
             data.append('done', 'done');
 
             fetch('${pageContext.request.contextPath}/receipt', {
@@ -104,10 +107,16 @@
                 }
             ).then(response => {
                 if (response.status === 200) {
-                    event.target.parentElement.parentElement.classList.remove('table-primary');
-                    event.target.parentElement.parentElement.classList.add('table-success');
-                    event.target.parentElement.parentElement.children[4].innerHTML = 'true';
-                    event.target.parentElement.parentElement.children[8].innerHTML = '<button class="btn btn-danger" type="button">Cancel</button>'
+                    let tableRow = event.target.parentElement.parentElement;
+                    let role = '${user.role}';
+
+                    tableRow.classList.remove('table-primary');
+                    tableRow.classList.add('table-success');
+                    tableRow.children[4].innerHTML = 'true';
+
+                    if (role === 'ADMIN' || role === 'SENIOR_CASHIER') {
+                        tableRow.children[8].innerHTML = '<button class="btn btn-danger" type="button">Cancel</button>'
+                    }
                     event.target.remove();
                 }
             })
@@ -120,19 +129,20 @@
                 method: 'DELETE',
                 body: data
             }).then(response => {
-                if(response.status === 200){
-                    event.target.parentElement.parentElement.classList.remove('table-success');
-                    event.target.parentElement.parentElement.classList.add('table-danger');
-                    let userName = '${sessionScope.get("user").getUsername()}';
-                    event.target.parentElement.parentElement.children[5].innerHTML = 'true';
-                    event.target.parentElement.parentElement.children[6].innerHTML = userName;
+                if (response.status === 200) {
+                    let tableRow = event.target.parentElement.parentElement;
+                    let userName = '${user.username}';
+
+                    tableRow.classList.remove('table-success');
+                    tableRow.classList.add('table-danger');
+                    tableRow.children[5].innerHTML = 'true';
+                    tableRow.children[6].innerHTML = userName;
+
                     event.target.remove();
                 }
             })
         }
 
     });
-
-
 </script>
 </html>
