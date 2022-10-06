@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     public boolean isUserExists(User user) {
         try (Connection connection = DBUtil.getConnection()) {
             return userDAO.isUserExists(connection, user.getUsername()) || userDAO.isUserExists(connection, user.getId());
-        } catch (SQLException | NamingException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
     public boolean isUserExists(String name) {
         try (Connection connection = DBUtil.getConnection()) {
             return userDAO.isUserExists(connection, name);
-        } catch (SQLException | NamingException e) {
+        } catch (SQLException e) {
             log.error("Something is wrong: ", e);
             return false;
         }
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
             connection.setAutoCommit(false);
             userDAO.insert(connection, user);
             connection.commit();
-        } catch (SQLException | NamingException e) {
+        } catch (SQLException e) {
             if (connection != null) {
                 try {
                     connection.rollback();
@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
     public User findUserByName(String name) throws IOException {
         try (Connection connection = DBUtil.getConnection()) {
             return userDAO.findByUsername(connection, name);
-        } catch (SQLException | NamingException exp) {
+        } catch (SQLException exp) {
             log.error("Something is wrong: ", exp);
             throw new IOException("Smth is wrong", exp);
         }
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
     public List<User> findAll() throws IOException {
         try (Connection connection = DBUtil.getConnection()) {
             return userDAO.findAll(connection);
-        } catch (SQLException | NamingException exp) {
+        } catch (SQLException exp) {
             log.error("Something is wrong: ", exp);
             throw new IOException("Smth is wrong", exp);
         }
@@ -108,7 +108,7 @@ public class UserServiceImpl implements UserService {
             connection.setAutoCommit(false);
             userDAO.update(connection, user);
             connection.commit();
-        } catch (SQLException | NamingException exp) {
+        } catch (SQLException exp) {
             if (connection != null) {
                 try {
                     connection.rollback();
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
             connection.setAutoCommit(false);
             userDAO.delete(connection, id);
             connection.commit();
-        } catch (SQLException | NamingException exp) {
+        } catch (SQLException exp) {
             if (connection != null) {
                 try {
                     connection.rollback();
@@ -166,7 +166,7 @@ public class UserServiceImpl implements UserService {
             connection.setAutoCommit(false);
             userDAO.delete(connection, username);
             connection.commit();
-        } catch (SQLException | NamingException exp) {
+        } catch (SQLException exp) {
             if (connection != null) {
                 try {
                     connection.rollback();

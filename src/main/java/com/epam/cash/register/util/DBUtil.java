@@ -16,14 +16,22 @@ public class DBUtil {
 
     private static final Logger log = LogManager.getLogger(DBUtil.class);
 
-    public static DataSource getDataSource() throws NamingException {
-        InitialContext ctx = new InitialContext();
-        DataSource ds = (DataSource) ctx.lookup(RESOURCE);
+    private static DataSource dataSource;
+
+    public static DataSource getDataSource() {
+        if (dataSource == null) {
+            try {
+                InitialContext ctx = new InitialContext();
+                dataSource = (DataSource) ctx.lookup(RESOURCE);
+            } catch (NamingException exp) {
+                log.error("A wrong with datasourse {0}", exp);
+            }
+        }
         log.trace("Getting datasource from Tomcat");
-        return ds;
+        return dataSource;
     }
 
-    public static Connection getConnection() throws NamingException, SQLException {
+    public static Connection getConnection() throws SQLException {
         return getDataSource().getConnection();
     }
 

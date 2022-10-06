@@ -36,7 +36,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     public List<Receipt> findAll() throws IOException {
         try (Connection connection = DBUtil.getConnection()) {
             return receiptDAO.findAll(connection);
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             log.error("Ooops, something is wrong", exp);
             throw new IOException("Ooops, something is wrong", exp);
         }
@@ -46,7 +46,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     public Receipt findByCode(String receiptCode) throws IOException {
         try (Connection connection = DBUtil.getConnection()) {
             return receiptDAO.findByCode(connection, receiptCode);
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             log.error("Ooops, something is wrong", exp);
             throw new IOException("Ooops, something is wrong", exp);
         }
@@ -56,7 +56,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     public List<Receipt> findByUsername(String creatorName) throws IOException {
         try (Connection connection = DBUtil.getConnection()) {
             return receiptDAO.findByUsername(connection, creatorName);
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             log.error("Ooops, something is wrong", exp);
             throw new IOException("Ooops, something is wrong", exp);
         }
@@ -66,7 +66,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     public Receipt findById(long idReceipt) throws IOException {
         try (Connection connection = DBUtil.getConnection()) {
             return receiptDAO.findById(connection, idReceipt);
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             log.error("Ooops, something is wrong", exp);
             throw new IOException("Ooops, something is wrong", exp);
         }
@@ -76,7 +76,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     public List<Receipt> findAllBetweenDate(Date from, Date to) throws IOException {
         try (Connection connection = DBUtil.getConnection()) {
             return receiptDAO.findAllBetweenDate(connection, from, to);
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             log.error("Ooops, something is wrong", exp);
             throw new IOException("Ooops, something is wrong", exp);
         }
@@ -86,7 +86,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     public List<Receipt> findAllCanceled() throws IOException {
         try (Connection connection = DBUtil.getConnection()) {
             return receiptDAO.findAllCanceled(connection);
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             log.error("Ooops, something is wrong", exp);
             throw new IOException("Ooops, something is wrong", exp);
         }
@@ -96,7 +96,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     public List<Receipt> findCanceled(String username) throws IOException {
         try (Connection connection = DBUtil.getConnection()) {
             return receiptDAO.findCanceled(connection, username);
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             log.error("Ooops, something is wrong", exp);
             throw new IOException("Ooops, something is wrong", exp);
         }
@@ -106,7 +106,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     public List<Receipt> findAllBetweenPrice(double from, double to) throws IOException {
         try (Connection connection = DBUtil.getConnection()) {
             return receiptDAO.findAllBetweenPrice(connection, from, to);
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             log.error("Ooops, something is wrong", exp);
             throw new IOException("Ooops, something is wrong", exp);
         }
@@ -116,7 +116,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     public Receipt findByProcessedUser(User user) throws IOException {
         try (Connection connection = DBUtil.getConnection()) {
             return receiptDAO.findByProcessedUser(connection, user);
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             log.error("Ooops, something is wrong", exp);
             throw new IOException("Ooops, something is wrong", exp);
         }
@@ -135,7 +135,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
             receiptDAO.insert(connection, receipt);
             connection.commit();
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             if (connection != null) {
                 try {
                     connection.rollback();
@@ -167,7 +167,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
             receiptDAO.update(connection, receipt);
             connection.commit();
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             if (connection != null) {
                 try {
                     connection.rollback();
@@ -196,7 +196,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             connection.setAutoCommit(false);
             receiptDAO.insert(connection, receipts);
             connection.commit();
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             if (connection != null) {
                 try {
                     connection.rollback();
@@ -225,7 +225,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             connection.setAutoCommit(false);
             receiptDAO.delete(connection, id);
             connection.commit();
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             if (connection != null) {
                 try {
                     connection.rollback();
@@ -254,7 +254,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             connection.setAutoCommit(false);
             receiptDAO.delete(connection, id);
             connection.commit();
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             if (connection != null) {
                 try {
                     connection.rollback();
@@ -283,7 +283,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             connection.setAutoCommit(false);
             receiptDAO.cancelItemReceipt(connection, itemReceipt);
             connection.commit();
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             if (connection != null) {
                 try {
                     connection.rollback();
@@ -314,7 +314,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             connection.setAutoCommit(false);
             receiptDAO.cancelReceipt(connection, receipt);
             connection.commit();
-        } catch (NamingException | SQLException exp) {
+        } catch (SQLException exp) {
             if (connection != null) {
                 try {
                     connection.rollback();
@@ -352,7 +352,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             connection.setAutoCommit(false);
             receiptDAO.cancelReceipt(connection, canceledReceipt);
             connection.commit();
-        } catch (SQLException | NamingException exp) {
+        } catch (SQLException exp) {
             if (connection != null) {
                 try {
                     connection.rollback();
