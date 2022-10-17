@@ -24,9 +24,11 @@
                         <li class="search">
                             <div class="d-flex justify-content-center">
                                 <div class="input-group mb-3" style="width: 90%">
-                                    <input type="text" class="form-control" placeholder="Creator`s name">
+                                    <input type="text" class="form-control" placeholder="Creator`s name"
+                                           id="inputFilterUserCreator">
                                     <div class="input-group-append">
-                                        <button class="btn btn-secondary" type="button"><i class="bi bi-search"></i>
+                                        <button class="btn btn-secondary" type="button"
+                                                onclick="findReceiptsByCreatorName()"><i class="bi bi-search"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -35,9 +37,11 @@
                         <li class="search">
                             <div class="d-flex justify-content-center">
                                 <div class="input-group mb-3" style="width: 90%">
-                                    <input type="text" class="form-control" placeholder="Receipt`s code">
+                                    <input type="text" class="form-control" placeholder="Receipt`s code"
+                                           id="inputFilterReceiptCode">
                                     <div class="input-group-append">
-                                        <button class="btn btn-secondary" type="button"><i class="bi bi-search"></i>
+                                        <button class="btn btn-secondary" type="button"
+                                                onclick="findReceiptsByReceiptCode()"><i class="bi bi-search"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -46,16 +50,17 @@
                         <li class="search">
                             <div class="d-flex justify-content-center">
                                 <div class="input-group mb-3" style="width: 90%">
-                                    <input type="text" class="form-control" placeholder="Canceler`s name">
+                                    <input type="text" class="form-control" placeholder="Canceler`s name"
+                                           id="inputFilterUserCanceler">
                                     <div class="input-group-append">
-                                        <button class="btn btn-secondary" type="button"><i class="bi bi-search"></i>
+                                        <button class="btn btn-secondary" type="button"
+                                                onclick="findReceiptsByCancelerName()"><i class="bi bi-search"></i>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </li>
                     </ul>
-
                     <small class="text-muted px-3">Filter</small>
                     <ul>
                         <li class="search">
@@ -64,7 +69,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Min price: </span>
                                     </div>
-                                    <input type="number" class="form-control">
+                                    <input type="number" class="form-control" id="minPrice_Filtering">
                                 </div>
                             </div>
                             <div class="d-flex justify-content-center">
@@ -72,47 +77,41 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Max price: </span>
                                     </div>
-                                    <input type="number" class="form-control">
+                                    <input type="number" class="form-control" id="maxPrice_Filtering">
                                 </div>
                             </div>
                         </li>
                         <li class="search">
                             <div class="d-flex justify-content-center">
                                 <div class="input-group mb-3" style="width: 90%; color: #f3f5f9">
-                                    <i class="fas fa-code"></i>Canceled</a>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                               value="true">
-                                        <label class="form-check-label" for="inlineRadio1">YES</label>
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Canceled</span>
                                     </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                               value="false">
-                                        <label class="form-check-label" for="inlineRadio2">NO</label>
-                                    </div>
+                                    <select id="isCanceled_Filtering" class="form-control">
+                                        <option>ANY</option>
+                                        <option>TRUE</option>
+                                        <option>FALSE</option>
+                                    </select>
                                 </div>
                             </div>
                         </li>
                         <li class="search">
                             <div class="d-flex justify-content-center">
                                 <div class="input-group mb-3" style="width: 90%; color: #f3f5f9">
-                                    <i class="fas fa-code"></i>Done</a>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                               id="inlineRadio1" value="true">
-                                        <label class="form-check-label" for="inlineRadio1">YES</label>
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Done</span>
                                     </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="inlineRadioOptions"
-                                               id="inlineRadio2" value="false">
-                                        <label class="form-check-label" for="inlineRadio2">NO</label>
-                                    </div>
+                                    <select id="isDone_Filtering" class="form-control">
+                                        <option>ANY</option>
+                                        <option>TRUE</option>
+                                        <option>FALSE</option>
+                                    </select>
                                 </div>
                             </div>
                         </li>
                         <li class="search">
                             <div class="d-flex justify-content-center">
-                                <button class="btn btn-success" style="width: 90%">Filter</button>
+                                <button class="btn btn-success" style="width: 90%" id="filteringButton">Filter</button>
                             </div>
                         </li>
                     </ul>
@@ -191,9 +190,6 @@
     </div>
 </div>
 
-<%--<div class="container-sm">--%>
-
-<%--</div>--%>
 </body>
 <script>
     let table = document.getElementById('table');
@@ -256,5 +252,57 @@
             })
         }
     });
+
+    document.getElementById('filteringButton').addEventListener('click', event => {
+        const isButton = event.target.nodeName === 'BUTTON';
+        if (!isButton) {
+            return;
+        }
+
+        let params = "";
+
+        let minPrice = $('#minPrice_Filtering').val();
+        if (minPrice.length !== 0) {
+            params += '&minPrice=' + $('#minPrice_Filtering').val();
+        }
+
+        let maxPrice = $('#maxPrice_Filtering').val();
+        if (maxPrice.length !== 0) {
+            params += '&maxPrice=' + $('#maxPrice_Filtering').val();
+        }
+
+        let isCanceled = $('#isCanceled_Filtering option:selected').text();
+        if (isCanceled !== 'ANY') {
+            params += '&isCanceled=' + (isCanceled === 'TRUE');
+        }
+
+        let isDone = $('#isDone_Filtering option:selected').text();
+        if (isDone !== 'ANY') {
+            params += '&isDone=' + (isDone === 'TRUE');
+        }
+
+        console.log(params);
+
+        window.location.replace('${pageContext.request.contextPath}?filtering=true' + params);
+    });
+
+    function findReceiptsByCreatorName() {
+        let params = "&creatorName=";
+        params += $('#inputFilterUserCreator').val();
+        window.location.replace('${pageContext.request.contextPath}?filtering=true' + params);
+    }
+
+    function findReceiptsByReceiptCode() {
+        let params = "&receiptCode=";
+        params += $('#inputFilterReceiptCode').val();
+        window.location.replace('${pageContext.request.contextPath}?filtering=true' + params);
+    }
+
+    function findReceiptsByCancelerName() {
+        let params = "&cancelerName=";
+        params += $('#inputFilterReceiptCode').val();
+        window.location.replace('${pageContext.request.contextPath}?filtering=true' + params);
+    }
+
 </script>
 </html>

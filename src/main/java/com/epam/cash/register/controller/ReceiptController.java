@@ -1,5 +1,8 @@
 package com.epam.cash.register.controller;
 
+import com.epam.cash.register.command.Command;
+import com.epam.cash.register.command.ReceiptCreateCommand;
+import com.epam.cash.register.command.ReceiptFilterCommand;
 import com.epam.cash.register.entity.ItemReceipt;
 import com.epam.cash.register.entity.Receipt;
 import com.epam.cash.register.entity.User;
@@ -41,58 +44,17 @@ public class ReceiptController extends HttpServlet {
 
         req.setAttribute("receipts", receipts);
 
+        Command command = new ReceiptFilterCommand();
+        command.execute(req, resp);
+
         req.getRequestDispatcher("WEB-INF/jsp-pages/receipt.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Command creatingReceiptCommand = new ReceiptCreateCommand();
 
-        Map<String, String> map = RequestUtil.getMapFromBody(req.getInputStream());
-
-        String receiptCode = (String) req.getSession().getAttribute("receiptCode");
-
-        User user = (User) req.getSession().getAttribute("user");
-
-
-        if (map.containsKey("done")) {
-            Receipt receipt = receiptService.findByCode(map.get("receiptCode"));
-            receiptService.acceptReceipt(receipt);
-
-            String currentReceiptCode = (String) req.getSession().getAttribute("receiptCode");
-            if (currentReceiptCode != null && currentReceiptCode.equals(map.get("receiptCode"))) {
-                req.getSession().setAttribute("receiptCode", null);
-            }
-
-            return;
-        }
-
-        if (receiptCode == null) {
-            receiptCode = UUID.randomUUID().toString();
-            req.getSession().setAttribute("receiptCode", receiptCode);
-            Receipt receipt = new Receipt(
-                    receiptCode,
-                    user,
-                    new ArrayList<>()
-            );
-            receipt.addItemReceipt(
-                    new ItemReceipt(
-                            0L,
-                            Long.parseLong(map.get("quantityProduct")),
-                            productService.findById(Long.parseLong(map.get("productID")))
-                    )
-            );
-            receiptService.insert(receipt);
-            return;
-        }
-        Receipt receipt = receiptService.findByCode(receiptCode);
-        receipt.addItemReceipt(
-                new ItemReceipt(
-                        0L,
-                        Long.parseLong(map.get("quantityProduct")),
-                        productService.findById(Long.parseLong(map.get("productID")))
-                )
-        );
-        receiptService.update(receipt);
+        creatingReceiptCommand.execute(req, resp);
     }
 
     @Override
