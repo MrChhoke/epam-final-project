@@ -1,5 +1,8 @@
 package com.epam.cash.register.controller;
 
+import com.epam.cash.register.command.Command;
+import com.epam.cash.register.command.ProductFilterCommand;
+import com.epam.cash.register.command.ProductShowerElementReceiptCommand;
 import com.epam.cash.register.entity.Product;
 import com.epam.cash.register.entity.Receipt;
 import com.epam.cash.register.entity.User;
@@ -23,25 +26,21 @@ public class ProductController extends HttpServlet {
 
     private static final Logger log = LogManager.getLogger(ProductController.class);
 
-    private ProductService productService = new ProductServiceImpl();
-    private UserService userService = new UserServiceImpl();
-    private ReceiptService receiptService = new ReceiptServiceImpl();
+    private final ProductService productService = new ProductServiceImpl();
+    private final UserService userService = new UserServiceImpl();
+    private final ReceiptService receiptService = new ReceiptServiceImpl();
+    private final Command filterProductCommand = new ProductFilterCommand();
+    private final Command productShowerElementReceiptCommand = new ProductShowerElementReceiptCommand();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setAttribute("all_products", productService.findAll());
+        req.setAttribute("allProducts", productService.findAll());
 
-        String receiptCode = (String) req.getSession().getAttribute("receiptCode");
-        Map<Long, Long> mapProductAtReceipt = new HashMap<>();
+        filterProductCommand.execute(req, resp);
 
-        if (receiptCode != null) {
-            Receipt receipt = receiptService.findByCode(receiptCode);
-            receipt.getItems().forEach(
-                    itemReceipt -> mapProductAtReceipt.put(itemReceipt.getProduct().getId(), itemReceipt.getQuantity())
-            );
+        //show products at the current receipt
+        productShowerElementReceiptCommand.execute(req, resp);
 
-        }
-        req.setAttribute("mapProductAtReceipt", mapProductAtReceipt);
         req.getRequestDispatcher("/WEB-INF/jsp-pages/products.jsp").forward(req, resp);
     }
 

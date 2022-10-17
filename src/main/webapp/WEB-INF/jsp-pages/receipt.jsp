@@ -117,8 +117,9 @@
                     </ul>
                     <small class="text-muted px-3">NAVIGATION</small>
                     <ul>
-                        <li><a href="#"><i class="fas fa-external-link-alt"></i>Main page</a></li>
-                        <li><a href="#"><i class="fas fa-code"></i>Product</a></li>
+                        <li><a href="${pageContext.request.contextPath}/"><i class="fas fa-external-link-alt"></i>Main page</a></li>
+                        <li><a href="${pageContext.request.contextPath}/products"><i class="fas fa-code"></i>Products</a></li>
+                        <li><a href="${pageContext.request.contextPath}/receipt"><i class="fas fa-code"></i>Receipt</a></li>
                     </ul>
                 </div>
             </div>
