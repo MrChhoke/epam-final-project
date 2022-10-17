@@ -1,3 +1,5 @@
+package com.epam.cash.register.service;
+
 import com.epam.cash.register.dao.PostqreSQLProductDAO;
 import com.epam.cash.register.dao.ProductDAO;
 import com.epam.cash.register.dao.UserDAO;
@@ -5,11 +7,11 @@ import com.epam.cash.register.entity.Product;
 import com.epam.cash.register.entity.User;
 import com.epam.cash.register.exception.ProductNotFoundException;
 import com.epam.cash.register.exception.UserNotFoundException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -17,12 +19,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PostqreSQLProductDAOTest {
 
     private static final String COLUMN_ID_PRODUCT = "product_id";
@@ -119,7 +121,7 @@ public class PostqreSQLProductDAOTest {
         );
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws SQLException {
 
         when(mockConn.prepareStatement(anyString())).thenReturn(mockPreparedStmnt);
@@ -180,7 +182,7 @@ public class PostqreSQLProductDAOTest {
 
     }
 
-    @Test(expected = ProductNotFoundException.class)
+    @Test
     public void testGetProductByID_ThrowsException_IfProductDoesntExists() throws ProductNotFoundException, SQLException {
         long notExistID = 1903124L;
 
@@ -189,7 +191,7 @@ public class PostqreSQLProductDAOTest {
 
         ProductDAO productDAO = new PostqreSQLProductDAO();
 
-        productDAO.findById(mockConn, notExistID);
+        assertThrows(ProductNotFoundException.class, () -> productDAO.findById(mockConn, notExistID));
     }
 
     @Test

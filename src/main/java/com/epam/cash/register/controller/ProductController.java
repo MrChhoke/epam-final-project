@@ -1,10 +1,10 @@
 package com.epam.cash.register.controller;
 
 import com.epam.cash.register.command.Command;
+import com.epam.cash.register.command.ProductCreateCommand;
 import com.epam.cash.register.command.ProductFilterCommand;
 import com.epam.cash.register.command.ProductShowerElementReceiptCommand;
 import com.epam.cash.register.entity.Product;
-import com.epam.cash.register.entity.Receipt;
 import com.epam.cash.register.entity.User;
 import com.epam.cash.register.service.*;
 import com.epam.cash.register.util.RequestUtil;
@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 @WebServlet("/products")
@@ -31,6 +30,7 @@ public class ProductController extends HttpServlet {
     private final ReceiptService receiptService = new ReceiptServiceImpl();
     private final Command filterProductCommand = new ProductFilterCommand();
     private final Command productShowerElementReceiptCommand = new ProductShowerElementReceiptCommand();
+    private final Command productCreateCommand = new ProductCreateCommand();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -45,27 +45,14 @@ public class ProductController extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Map<String, String[]> map = req.getParameterMap();
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        productCreateCommand.execute(req, resp);
 
-        User user = (User) req.getSession().getAttribute("user");
-
-        Product product = new Product(
-                0,
-                map.get("code")[0],
-                map.get("title_ukr")[0],
-                map.get("title_eng")[0],
-                Long.parseLong(map.get("quantity")[0]),
-                Double.parseDouble(map.get("price")[0]),
-                new Date(),
-                user
-        );
-        productService.insert(product);
         resp.sendRedirect("/products");
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         long idDeletedProduct = -1;
         try {
             idDeletedProduct = Long.parseLong(req.getParameterMap().get("id")[0]);
@@ -78,10 +65,8 @@ public class ProductController extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Map<String, String> map = RequestUtil.getMapFromBody(req.getInputStream());
-
 
         User user = (User) req.getSession().getAttribute("user");
         Product product = new Product(
