@@ -3,6 +3,7 @@ package com.epam.cash.register.controller;
 import com.epam.cash.register.command.Command;
 import com.epam.cash.register.command.ReceiptCreateCommand;
 import com.epam.cash.register.command.ReceiptFilterCommand;
+import com.epam.cash.register.command.ReceiptPaginationCommand;
 import com.epam.cash.register.entity.ItemReceipt;
 import com.epam.cash.register.entity.Receipt;
 import com.epam.cash.register.entity.User;
@@ -29,6 +30,10 @@ public class ReceiptController extends HttpServlet {
     private ReceiptService receiptService;
     private ProductService productService;
 
+    private final Command creatingReceiptCommand = new ReceiptCreateCommand();
+    private final Command receiptPaginationCommand = new ReceiptPaginationCommand();
+    private final Command receiptFilterCommand = new ReceiptFilterCommand();
+
     public ReceiptController() {
     }
 
@@ -44,16 +49,16 @@ public class ReceiptController extends HttpServlet {
 
         req.setAttribute("receipts", receipts);
 
-        Command command = new ReceiptFilterCommand();
-        command.execute(req, resp);
+        receiptFilterCommand.execute(req, resp);
+
+        receiptPaginationCommand.execute(req, resp);
+
 
         req.getRequestDispatcher("WEB-INF/jsp-pages/receipt.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Command creatingReceiptCommand = new ReceiptCreateCommand();
-
         creatingReceiptCommand.execute(req, resp);
     }
 

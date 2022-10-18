@@ -10,6 +10,8 @@
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/sidebar.css">
+    <jsp:useBean id="numberCurrentPage" scope="request" type="java.lang.Integer"/>
+    <jsp:useBean id="amountPages" scope="request" type="java.lang.Integer"/>
     <jsp:useBean id="user" scope="session" class="com.epam.cash.register.entity.User"/>
     <jsp:useBean id="receipts" scope="request" type="java.util.List<com.epam.cash.register.entity.Receipt>"/>
 </head>
@@ -187,6 +189,22 @@
                     </tr>
                 </c:forEach>
             </table>
+            <nav aria-label="pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item ${numberCurrentPage == 1 ? 'disable' : ''}">
+                        <span class="page-link">Previous</span>
+                    </li>
+                    <c:forEach var="page" begin="1" step="1" end="${amountPages}">
+                        <li class="page-item ${numberCurrentPage == page ? 'active' : ''}">
+                            <a class="page-link"
+                               onclick="changePage(${page})">${page}</a>
+                        </li>
+                    </c:forEach>
+                    <li class="page-item ${numberCurrentPage == amountPages ? 'disable' : ''}">
+                        <a class="page-link">Next</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -303,6 +321,14 @@
         let params = "&cancelerName=";
         params += $('#inputFilterReceiptCode').val();
         window.location.replace('${pageContext.request.contextPath}?filtering=true' + params);
+    }
+
+    function changePage(nextPage){
+        if(document.URL.includes('?')){
+            window.location.replace(document.URL.replace('page=${numberCurrentPage}','').replace('&&','&') + '&page=' + nextPage);
+        }else{
+            window.location.replace(document.URL.replace('&page=${numberCurrentPage}','').replace('page=${numberCurrentPage}', '') + '?page=' + nextPage);
+        }
     }
 
 </script>

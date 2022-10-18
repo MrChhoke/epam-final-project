@@ -10,6 +10,8 @@
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/node_modules/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/sidebar.css">
+    <jsp:useBean id="numberCurrentPage" scope="request" type="java.lang.Integer"/>
+    <jsp:useBean id="amountPages" scope="request" type="java.lang.Integer"/>
     <jsp:useBean id="user" scope="session" type="com.epam.cash.register.entity.User"/>
     <jsp:useBean id="mapProductAtReceipt" scope="request" type="java.util.Map<java.lang.Long,java.lang.Long>"/>
     <jsp:useBean id="allProducts" scope="request" type="java.util.List<com.epam.cash.register.entity.Product>"/>
@@ -184,6 +186,22 @@
                     </tr>
                 </c:forEach>
             </table>
+            <nav aria-label="pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item ${numberCurrentPage == 1 ? 'disable' : ''}">
+                        <span class="page-link">Previous</span>
+                    </li>
+                    <c:forEach var="page" begin="1" step="1" end="${amountPages}">
+                        <li class="page-item ${numberCurrentPage == page ? 'active' : ''}">
+                            <a class="page-link"
+                               onclick="changePage(${page})">${page}</a>
+                        </li>
+                    </c:forEach>
+                    <li class="page-item ${numberCurrentPage == amountPages ? 'disable' : ''}">
+                        <a class="page-link">Next</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -347,6 +365,14 @@
         let params = "&englishTitle=";
         params += $('#inputFilterEnglishTitle').val();
         window.location.replace('${pageContext.request.contextPath}?filtering=true' + params);
+    }
+
+    function changePage(nextPage){
+        if(document.URL.includes('?')){
+            window.location.replace(document.URL.replace('page=${numberCurrentPage}','').replace('&&','&') + '&page=' + nextPage);
+        }else{
+            window.location.replace(document.URL.replace('&page=${numberCurrentPage}','').replace('page=${numberCurrentPage}', '') + '?page=' + nextPage);
+        }
     }
 </script>
 </html>

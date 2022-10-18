@@ -1,9 +1,6 @@
 package com.epam.cash.register.controller;
 
-import com.epam.cash.register.command.Command;
-import com.epam.cash.register.command.ProductCreateCommand;
-import com.epam.cash.register.command.ProductFilterCommand;
-import com.epam.cash.register.command.ProductShowerElementReceiptCommand;
+import com.epam.cash.register.command.*;
 import com.epam.cash.register.entity.Product;
 import com.epam.cash.register.entity.User;
 import com.epam.cash.register.service.*;
@@ -31,6 +28,7 @@ public class ProductController extends HttpServlet {
     private final Command filterProductCommand = new ProductFilterCommand();
     private final Command productShowerElementReceiptCommand = new ProductShowerElementReceiptCommand();
     private final Command productCreateCommand = new ProductCreateCommand();
+    private final Command productPaginationCommand = new ProductPaginationCommand();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -40,6 +38,9 @@ public class ProductController extends HttpServlet {
 
         //show products at the current receipt
         productShowerElementReceiptCommand.execute(req, resp);
+
+        // a pagination
+        productPaginationCommand.execute(req, resp);
 
         req.getRequestDispatcher("/WEB-INF/jsp-pages/products.jsp").forward(req, resp);
     }
