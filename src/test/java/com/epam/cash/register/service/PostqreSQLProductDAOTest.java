@@ -21,8 +21,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PostqreSQLProductDAOTest {
@@ -124,17 +123,17 @@ public class PostqreSQLProductDAOTest {
     @BeforeEach
     public void setUp() throws SQLException {
 
-        when(mockConn.prepareStatement(anyString())).thenReturn(mockPreparedStmnt);
-        when(mockConn.createStatement()).thenReturn(mockStatement);
+        lenient().when(mockConn.prepareStatement(anyString())).thenReturn(mockPreparedStmnt);
+        lenient().when(mockConn.createStatement()).thenReturn(mockStatement);
 
-        doNothing().when(mockPreparedStmnt).setString(anyInt(), anyString());
-        doNothing().when(mockPreparedStmnt).setLong(anyInt(), anyLong());
-        doNothing().when(mockPreparedStmnt).setDate(anyInt(), any());
+        lenient().doNothing().when(mockPreparedStmnt).setString(anyInt(), anyString());
+        lenient().doNothing().when(mockPreparedStmnt).setLong(anyInt(), anyLong());
+        lenient().doNothing().when(mockPreparedStmnt).setDate(anyInt(), any());
 
-        when(mockStatement.executeQuery(anyString())).thenReturn(mockResultSet);
-        when(mockPreparedStmnt.executeQuery()).thenReturn(mockResultSet);
+        lenient().when(mockStatement.executeQuery(anyString())).thenReturn(mockResultSet);
+        lenient().when(mockPreparedStmnt.executeQuery()).thenReturn(mockResultSet);
 
-        when(mockPreparedStmnt.execute()).thenReturn(Boolean.TRUE);
+        lenient().when(mockPreparedStmnt.execute()).thenReturn(Boolean.TRUE);
 
     }
 

@@ -3,6 +3,7 @@ package com.epam.cash.register.entity;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class Receipt {
 
@@ -164,5 +165,57 @@ public class Receipt {
 
     public void setDone(boolean done) {
         isDone = done;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Receipt receipt = (Receipt) o;
+
+        if (id != receipt.id) return false;
+        if (Double.compare(receipt.totalPrice, totalPrice) != 0) return false;
+        if (isCanceled != receipt.isCanceled) return false;
+        if (isDone != receipt.isDone) return false;
+        if (!Objects.equals(dateCreation, receipt.dateCreation))
+            return false;
+        if (!Objects.equals(receiptCode, receipt.receiptCode)) return false;
+        if (!Objects.equals(userCreator, receipt.userCreator)) return false;
+        if (!Objects.equals(userCanceler, receipt.userCanceler))
+            return false;
+        return Objects.equals(items, receipt.items);
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = (int) (id ^ (id >>> 32));
+        temp = Double.doubleToLongBits(totalPrice);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (dateCreation != null ? dateCreation.hashCode() : 0);
+        result = 31 * result + (receiptCode != null ? receiptCode.hashCode() : 0);
+        result = 31 * result + (userCreator != null ? userCreator.hashCode() : 0);
+        result = 31 * result + (isCanceled ? 1 : 0);
+        result = 31 * result + (isDone ? 1 : 0);
+        result = 31 * result + (userCanceler != null ? userCanceler.hashCode() : 0);
+        result = 31 * result + (items != null ? items.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Receipt{" +
+                "id=" + id +
+                ", totalPrice=" + totalPrice +
+                ", dateCreation=" + dateCreation +
+                ", receiptCode='" + receiptCode + '\'' +
+                ", userCreator=" + userCreator +
+                ", isCanceled=" + isCanceled +
+                ", isDone=" + isDone +
+                ", userCanceler=" + userCanceler +
+                ", items=" + items +
+                '}';
     }
 }

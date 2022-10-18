@@ -1,6 +1,7 @@
 package com.epam.cash.register.entity;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class Product {
 
@@ -109,5 +110,34 @@ public class Product {
 
     public void setUserCreator(User userCreator) {
         this.userCreator = userCreator;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Product product = (Product) o;
+
+        if (id != product.id) return false;
+        if (quantity != product.quantity) return false;
+        if (Double.compare(product.price, price) != 0) return false;
+        if (!Objects.equals(code, product.code)) return false;
+        if (!Objects.equals(title_ukr, product.title_ukr)) return false;
+        return Objects.equals(title_eng, product.title_eng);
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", code='" + code + '\'' +
+                ", title_ukr='" + title_ukr + '\'' +
+                ", title_eng='" + title_eng + '\'' +
+                ", quantity=" + quantity +
+                ", price=" + price +
+                ", dateCreation=" + dateCreation +
+                ", userCreator=" + userCreator +
+                '}';
     }
 }
